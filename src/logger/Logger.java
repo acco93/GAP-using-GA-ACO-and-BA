@@ -2,6 +2,15 @@ package logger;
 
 import java.util.HashSet;
 
+/**
+ * 
+ * Simple logger implemented as singleton.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 8:27:05 PM
+ *
+ */
 public class Logger {
 
 	private static Logger logger;

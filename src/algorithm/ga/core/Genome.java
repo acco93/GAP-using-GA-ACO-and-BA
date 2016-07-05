@@ -6,6 +6,16 @@ import java.util.List;
 import model.AppSettings;
 import model.Instance;
 
+
+/**
+ * 
+ * The set of solutions & some statistics.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 9:27:57 PM
+ *
+ */
 public class Genome {
 
 	private int fitnessSum;

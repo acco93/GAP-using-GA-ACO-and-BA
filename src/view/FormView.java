@@ -2,26 +2,28 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.io.File;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import controller.Controller;
 import model.State;
 
+/**
+ * View implementation.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 7:59:52 PM
+ *
+ */
 public class FormView extends JFrame implements View {
 
 	private static final int HEIGHT = 400;
@@ -44,7 +46,7 @@ public class FormView extends JFrame implements View {
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
-		statusLabel = new JLabel("Status: processing (65.3 s) ", SwingUtilities.CENTER);
+		statusLabel = new JLabel("", SwingUtilities.CENTER);
 		statusLabel.setOpaque(true);
 		statusLabel.setBackground(new Color(108, 158, 150));
 		statusLabel.setForeground(new Color(209, 227, 224));
@@ -58,31 +60,29 @@ public class FormView extends JFrame implements View {
 		tabbedPane.addTab("Help & instructions", hPanel);
 
 		fsPanel = new FileSelectionPanel();
-		// tabbedPane.addTab("File selection", fsPanel);
 
 		pPanel = new ParametersPanel();
 		tabbedPane.addTab("Configurations", pPanel);
 
 		ePanel = new ExecutionPanel(controller);
-		// tabbedPane.addTab("Execution", ePanel);
 
 		rPanel = new ResultsPanel(controller);
 		
-		JPanel resExecPanel = new JPanel(new BorderLayout());
-		JPanel resExecInPanel = new JPanel(new GridLayout(1,1));
+		JPanel innerPanel = new JPanel(new BorderLayout());
+		JPanel topBottomPanel = new JPanel(new GridLayout(1,1));
 		
 		toolBar = new ToolBar(controller);
 			
 		
-		resExecPanel.add(toolBar,BorderLayout.NORTH);
-		resExecPanel.add(resExecInPanel,BorderLayout.CENTER);
+		innerPanel.add(toolBar,BorderLayout.NORTH);
+		innerPanel.add(topBottomPanel,BorderLayout.CENTER);
 		
-		resExecInPanel.add(new JSplitPane(JSplitPane.VERTICAL_SPLIT,rPanel, ePanel));
+		topBottomPanel.add(new JSplitPane(JSplitPane.VERTICAL_SPLIT,rPanel, ePanel));
 		
 		
-		JSplitPane a = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fsPanel, resExecPanel);
+		JSplitPane outerPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fsPanel, innerPanel);
 		
-		tabbedPane.addTab("File selection & execution", a);
+		tabbedPane.addTab("File selection & execution", outerPanel);
 
 
 		this.add(mainPanel);

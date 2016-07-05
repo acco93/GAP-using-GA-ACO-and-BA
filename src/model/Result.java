@@ -1,5 +1,15 @@
 package model;
 
+/**
+ * 
+ * A result object contains aggregate info describing the results of each algorithm.
+ * NB: stopping the processing will cause an inconsistent result. The info about the missing algorithm will be zeroed.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 8:21:17 PM
+ *
+ */
 public class Result {
 
 	enum Algorithm {
@@ -30,6 +40,11 @@ public class Result {
 		this.antsTimeSum = 0;
 	}
 	
+	/**
+	 * Merge a partial result.
+	 * @param result
+	 * @param algorithm
+	 */
 	public void merge(PartialResult result, Algorithm algorithm){
 		switch(algorithm){
 		case ANTS:
@@ -50,7 +65,6 @@ public class Result {
 		default:
 			throw new IllegalStateException();
 			
-		
 		}
 	}
 	
@@ -103,7 +117,14 @@ public class Result {
 		return this.runs;
 	}
 	
-	
+	/**
+	 * Info actually produced by a single run.
+	 * 
+	 * @author acco
+	 * 
+	 * Jul 5, 2016 8:25:16 PM
+	 *
+	 */
 	public static class PartialResult{
 		
 		private int value;

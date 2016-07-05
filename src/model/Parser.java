@@ -9,16 +9,22 @@ import java.util.List;
 import controller.Controller;
 import logger.Logger;
 
+/**
+ * Simple problem parser.
+ * See http://people.brunel.ac.uk/~mastjjb/jeb/orlib/gapinfo.html for the file structure.
+ * @author acco
+ * 
+ * Jul 5, 2016 8:19:43 PM
+ *
+ */
 public class Parser {
 
 	private BufferedReader br;
 	private boolean errors;
 	private String filePath;
 	private List<Instance> instances;
-	private Controller controller;
 
 	public Parser(String filePath, Controller controller) {
-		this.controller = controller;
 		try {
 			this.filePath = filePath;
 			this.br = new BufferedReader(new FileReader(filePath));

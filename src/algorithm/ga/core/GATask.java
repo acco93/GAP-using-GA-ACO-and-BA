@@ -1,15 +1,23 @@
 package algorithm.ga.core;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
 import algorithm.ga.crossover.CrossoverMethod;
 import algorithm.ga.selection.SelectionMethod;
+import util.Pair;
 
-
-public class GATask implements Callable<List<Chromosome>>{
+/**
+ * 
+ * GA step (parents to offsprings) implemented as a logical task (async computation)
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 9:28:49 PM
+ *
+ */
+public class GATask implements Callable<Pair<Chromosome, Chromosome>> {
 
 	private SelectionMethod selection;
 	private CrossoverMethod crossover;
@@ -19,54 +27,49 @@ public class GATask implements Callable<List<Chromosome>>{
 	private Genome genome;
 	private List<Chromosome> population;
 
-	public GATask(Genome genome, SelectionMethod selection, CrossoverMethod crossover, double crossoverProbability, double mutationProbability){
+	public GATask(Genome genome, SelectionMethod selection, CrossoverMethod crossover, double crossoverProbability,
+			double mutationProbability) {
 		this.genome = genome;
 		this.selection = selection;
 		this.crossover = crossover;
 		this.crossoverProbability = crossoverProbability;
 		this.mutationProbability = mutationProbability;
-		
+
 		this.population = this.genome.getPopulation();
 	}
-	
 
 	@Override
-	public List<Chromosome> call() throws Exception {
-		
+	public Pair<Chromosome, Chromosome> call() throws Exception {
+
 		/*
 		 * Selection.
 		 */
 		Chromosome parentA = this.population.get(this.selection.apply(this.genome));
 		Chromosome parentB = this.population.get(this.selection.apply(this.genome));
-		
+
 		/*
 		 * Crossover.
 		 */
-		List<Chromosome> offsprings;
+		Pair<Chromosome, Chromosome> offsprings;
 		if (new Random().nextDouble() < this.crossoverProbability) {
 			offsprings = this.crossover.apply(parentA, parentB);
 		} else {
-			offsprings = new ArrayList<>();
-			offsprings.add(parentA);
-			offsprings.add(parentB);
+			offsprings = new Pair<>(parentA, parentB);
 		}
-			
-		
-		for (Chromosome child : offsprings) {
-			/*
-			 * Mutation.
-			 */
-			if (new Random().nextDouble() < this.mutationProbability) {
-				child.mutation();
-			}
-			/*
-			 * Local search.
-			 */
-			child.localSearch();
+
+		/*
+		 * Mutation.
+		 */
+		if (new Random().nextDouble() < this.mutationProbability) {
+			offsprings.getFirst().mutation();
+			offsprings.getSecond().mutation();
 		}
-		
-		
-		
+		/*
+		 * Local search.
+		 */
+		offsprings.getFirst().localSearch();
+		offsprings.getSecond().localSearch();
+
 		return offsprings;
 	}
 

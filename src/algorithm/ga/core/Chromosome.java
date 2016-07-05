@@ -2,10 +2,17 @@ package algorithm.ga.core;
 import java.util.Arrays;
 import java.util.Random;
 
-import algorithm.ga.fitness.FitnessEvaluation;
 import model.Instance;
 
-
+/**
+ * 
+ * Solution representation.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 9:31:41 PM
+ *
+ */
 
 public class Chromosome {
 

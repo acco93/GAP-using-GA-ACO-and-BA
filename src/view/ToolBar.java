@@ -2,10 +2,11 @@ package view;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 
 import controller.Controller;
-import io.SaveResultsTask;
+import io.ExportResultsTask;
 
 /**
  * 
@@ -70,7 +71,11 @@ public class ToolBar extends JToolBar {
 		exportButton.setContentAreaFilled(false);
 
 		exportButton.addActionListener((e) -> {
-			new Thread(new SaveResultsTask(controller.getResults()));
+			if(controller.getResults().isEmpty()){
+				JOptionPane.showMessageDialog (null, "Mmmmm no results?!", "Ops... Nothing to export", JOptionPane.WARNING_MESSAGE);
+			} else {
+				new Thread(new ExportResultsTask(controller.getResults())).start();				
+			}
 		});
 		this.add(exportButton);
 

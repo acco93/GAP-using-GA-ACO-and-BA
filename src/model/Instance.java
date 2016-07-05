@@ -1,6 +1,15 @@
 package model;
 import java.util.Arrays;
 
+/**
+ * 
+ * Problem instance implementation. It contains all the problem info.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 8:17:07 PM
+ *
+ */
 public class Instance {
 
 	private String name;

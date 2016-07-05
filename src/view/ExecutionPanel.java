@@ -2,7 +2,6 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -12,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -27,6 +27,16 @@ import controller.Controller;
 import logger.LogViewer;
 import logger.Logger;
 
+
+/**
+ * 
+ * Log panel.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 8:04:26 PM
+ *
+ */
 public class ExecutionPanel extends JPanel implements LogViewer {
 
 	private static final long serialVersionUID = 1L;
@@ -45,8 +55,8 @@ public class ExecutionPanel extends JPanel implements LogViewer {
 		this.setLayout(new BorderLayout());
 		this.setBackground(R.BACKGROUND_COLOR);
 
-/*		JLabel titleLabel = new JLabel(":: EXECUTION LOG ::", SwingUtilities.CENTER);
-		this.add(titleLabel, BorderLayout.NORTH);*/
+		JLabel titleLabel = new JLabel(":: EXECUTION LOG ::", SwingUtilities.CENTER);
+		this.add(titleLabel, BorderLayout.NORTH);
 
 		JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		bottomPanel.setOpaque(false);
@@ -57,9 +67,7 @@ public class ExecutionPanel extends JPanel implements LogViewer {
 			buttonIcon = ImageIO.read(new File("icons/MinusRedButton.png"));
 
 			JButton clearButton = new JButton(new ImageIcon(buttonIcon));
-			//clearButton.setPreferredSize(new Dimension(25,25));
 			clearButton.setToolTipText("Clear the log");
-			//clearButton.setBorder(BorderFactory.createEmptyBorder());
 			clearButton.setContentAreaFilled(false);
 			clearButton.addActionListener((e) -> {
 				SwingUtilities.invokeLater(() -> {

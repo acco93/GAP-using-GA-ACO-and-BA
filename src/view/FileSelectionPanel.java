@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,6 +20,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+/**
+ * 
+ * File list panel
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 8:03:07 PM
+ *
+ */
 public class FileSelectionPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -51,7 +59,6 @@ public class FileSelectionPanel extends JPanel {
 			BufferedImage addButtonIcon = ImageIO.read(new File("icons/Add.png"));
 			addButton = new JButton(new ImageIcon(addButtonIcon));
 			addButton.setToolTipText("Add file(s)");
-			//addButton.setBorder(BorderFactory.createEmptyBorder());
 			addButton.setContentAreaFilled(false);
 			addButton.addActionListener((e) -> {
 				JFileChooser chose = new JFileChooser();
@@ -71,7 +78,6 @@ public class FileSelectionPanel extends JPanel {
 			BufferedImage removeButtonIcon = ImageIO.read(new File("icons/Remove.png"));
 			removeButton = new JButton(new ImageIcon(removeButtonIcon));
 			removeButton.setToolTipText("Remove selected file(s)");
-			//removeButton.setBorder(BorderFactory.createEmptyBorder());
 			removeButton.setContentAreaFilled(false);
 			removeButton.addActionListener((e) -> {
 				int count = list.getSelectedIndices().length;

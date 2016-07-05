@@ -9,6 +9,14 @@ import java.util.Map;
 import controller.Controller;
 import controller.SharedAppData;
 
+/**
+ * MVC model implementation.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 8:17:50 PM
+ *
+ */
 public class Model {
 
 	private List<File> filePaths;
@@ -29,7 +37,9 @@ public class Model {
 	}
 
 	public void compute() {
-
+		/*
+		 * Run the compute task in a separate thread otherwise the ui will freeze
+		 */
 		ComputeTask cp = new ComputeTask(filePaths,controller, results, sd);
 		new Thread(cp).start();
 		

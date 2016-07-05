@@ -1,5 +1,14 @@
 package model;
 
+/**
+ * 
+ * Application possible states.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 8:26:24 PM
+ *
+ */
 public enum State {
 
 	IDLE, PROCESSING, ERROR, COMPLETED, COMPLETED_WITH_ERRORS, STOPPED, STOPPING;

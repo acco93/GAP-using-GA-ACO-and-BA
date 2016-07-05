@@ -6,6 +6,15 @@ import java.util.Random;
 import model.AppSettings;
 import model.Instance;
 
+/**
+ * 
+ * Ant.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 9:33:50 PM
+ *
+ */
 public class Ant {
 
 	private static final int PENALTY = 10;
@@ -227,7 +236,6 @@ public class Ant {
 	public void updateTrace() {
 
 		for (int i = 0; i < instance.getJobsNum(); i++) {
-			// invece che 1/costs si potrebbe fare qualcosa di più raffinato	
 			tau[i][solution[i]] += (1.0/AppSettings.get().antsPopulation) * (double)this.cost;
 		}
 		

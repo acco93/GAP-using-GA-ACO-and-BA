@@ -1,16 +1,24 @@
 package algorithm.ga.crossover;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import algorithm.ga.core.Chromosome;
 import model.Instance;
+import util.Pair;
 
+/**
+ * 
+ * Single point crossover: exchange genes after a randomly chosen point.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 9:26:11 PM
+ *
+ */
 public class SinglePointCrossover implements CrossoverMethod {
 	
 	@Override
-	public List<Chromosome> apply(Chromosome parentA, Chromosome parentB) {
+	public Pair<Chromosome, Chromosome> apply(Chromosome parentA, Chromosome parentB) {
 		
 		Instance instance = parentA.getInstance();
 		int jobsNum = instance.getJobsNum();
@@ -33,10 +41,8 @@ public class SinglePointCrossover implements CrossoverMethod {
 			childB[i] = arrayA[i];
 		}
 
-		List<Chromosome> offsprings = new ArrayList<>();
-		offsprings.add(new Chromosome(instance, childA));
-		offsprings.add(new Chromosome(instance, childB));
-		return offsprings;
+
+		return new Pair<>(new Chromosome(instance, childA),new Chromosome(instance, childB));
 	}
 
 }

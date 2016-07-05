@@ -10,6 +10,15 @@ import model.State;
 import view.FormView;
 import view.View;
 
+/**
+ * 
+ * MVC Controller implementation.
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 8:35:34 PM
+ *
+ */
 public class Controller {
 
 	private View view;

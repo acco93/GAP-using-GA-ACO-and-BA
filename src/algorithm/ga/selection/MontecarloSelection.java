@@ -4,6 +4,16 @@ import java.util.Random;
 
 import algorithm.ga.core.Genome;
 
+/**
+ * 
+ * Montecarlo selection (roulette wheel selection): chose a solution with a probability
+ * proportional to its fitness
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 9:01:14 PM
+ *
+ */
 public class MontecarloSelection implements SelectionMethod {
 
 	@Override

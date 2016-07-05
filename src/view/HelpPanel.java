@@ -3,7 +3,6 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,17 +17,7 @@ import javax.swing.text.StyledDocument;
 public class HelpPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private static final String HELP_TEXT = "..:: HOW IT WORKS ::..\n"
-			+ "\na. The application works with files in the format described in:\n--> http://people.brunel.ac.uk/~mastjjb/jeb/orlib/gapinfo.html\n"
-			+ "\nProblem files are downloadable from: \n--> http://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/ "
-			+ "under the name: gap*.txt\n" + "\nb. Add one or more files in the File Selection tab\n"
-			+ "\nc. Review (& edit) the algorithms parameters in the Configurations tab\n"
-			+ "\nd. Run the algorithms in the Execution tab\n" + "\ne. Get the results in the Results tab!\n"
-			+ "\n..:: PROBLEM NOTES ::..\n" + "\na. GAP is solved as a maximization problem.\n"
-			+ "\n..:: GA NOTES ::..\n" + "\nA lot of ideas have been taken from: \n"
-			+ "P.C.Chu and J.E.Beasley (1996) A genetic algorithm for the generalised assignment problem.\n"
-			+ "\nLocal searches performed:\n" + "\n..:: ANTS NOTES ::..\n";
-
+	
 	private StyledDocument doc;
 
 	public HelpPanel() {
@@ -40,17 +29,10 @@ public class HelpPanel extends JPanel {
 		titleLabel.setOpaque(false);
 		this.add(titleLabel, BorderLayout.NORTH);
 
-		/*
-		 * JEditorPane textArea = new JEditorPane();
-		 * textArea.setBackground(FormView.BACKGROUND_COLOR);
-		 * textArea.setEditable(false); textArea.setText(HELP_TEXT);
-		 * textArea.setSize(400, 400);
-		 */
 
 		JTextPane textArea = new JTextPane();
 		textArea.setBackground(R.BACKGROUND_COLOR);
 		textArea.setEditable(false);
-		// textArea.setText(HELP_TEXT);
 
 		doc = textArea.getStyledDocument();
 
@@ -69,12 +51,24 @@ public class HelpPanel extends JPanel {
 		StyleConstants.setItalic(paperStyle, true);
 		
 		
+		this.append("..:: GENERAL DESCRIPTION ::..", titleStyle);
+		this.append("This application tries to solve simple generalized assignment"
+				+ " problem (GAP) instances using a genetic algorithm and an ACO-based algorithm.",null);
+		this.append("They will be called GA and ANTS respectively from now on.", null);
+		this.append("GA and ANTS parameters are configurable up to a certain level.", null);
+
+		this.newLine();
+		this.append("Public repository available at:",null);
+		this.append("https://bitbucket.org/acco93/gap-using-heuristics",linkStyle);
+		this.newLine();
+		
 		this.append("..:: HOW IT WORKS ::..", titleStyle);
 		this.newLine();
-		this.append("a) Add one or more files (see the file structure section below) in the File Selection tab", null);
-		this.append("b) Review (& edit) the algorithms parameters in the Configurations tab", null);
-		this.append("c) Run the algorithms in the Execution tab", null);
-		this.append("d) Get the results in the Results tab!",null);
+		this.append("a) Tune the parameters as you wish in the Configuration tab", null);
+		this.append("b) Switch to the Workspace tab", null);
+		this.append("a) Add one or more files (see the file structure section below) in the file list", null);
+		this.append("c) Run the algorithms", null);
+		this.append("d) Get (& export to CSV) the results",null);
 		this.newLine();
 		
 		this.append("..:: FILE STRUCTURE ::..", titleStyle);
@@ -82,7 +76,7 @@ public class HelpPanel extends JPanel {
 		this.append("The application works with files in the format described in:", null);
 		this.append("http://people.brunel.ac.uk/~mastjjb/jeb/orlib/gapinfo.html", linkStyle);
 		this.newLine();
-		this.append("They are downloadable from:", null);
+		this.append("Some instances are downloadable from:", null);
 		this.append("http://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/", linkStyle);
 		this.append("under the name: gap*.txt", null);
 		this.newLine();
@@ -100,12 +94,7 @@ public class HelpPanel extends JPanel {
 		
 		this.append("..:: ANTS NOTES ::..", titleStyle);
 		this.newLine();
-		
-		this.append("..:: APP NOTES ::..", titleStyle);
-		this.newLine();
-		this.append("Public repository available at:",null);
-		this.append("https://bitbucket.org/acco93/gap-using-heuristics",linkStyle);
-		this.newLine();
+
 		
 		JScrollPane scroll = new JScrollPane(textArea);
 		scroll.setOpaque(false);

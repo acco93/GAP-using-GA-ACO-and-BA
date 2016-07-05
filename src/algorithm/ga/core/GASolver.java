@@ -20,7 +20,18 @@ import logger.Logger;
 import model.AppSettings;
 import model.Instance;
 import model.Result.PartialResult;
+import util.Pair;
 
+/**
+ * 
+ * The GA solver sets up some parameters according to the preferred user configuration then
+ * splits the problem into logical tasks processed by a fixed pool of threads. 
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 9:29:27 PM
+ *
+ */
 public class GASolver {
 
 	private int populationSize;
@@ -101,26 +112,29 @@ public class GASolver {
 			System.out.println(genome.getFitnessStandardDeviation());
 			
 			List<Chromosome> children = new ArrayList<Chromosome>();
-			LinkedList<Future<List<Chromosome>>> tasks = new LinkedList<>();
+			LinkedList<Future<Pair<Chromosome,Chromosome>>> tasks = new LinkedList<>();
 
 			/*
 			 * Submit the task.
 			 */
 			for (int p = 0; p < this.populationSize; p += 2) {
-				Future<List<Chromosome>> future = executor.submit(new GATask(genome, selectionMethod, crossoverMethod, crossoverProbability, mutationProbability));
+				Future<Pair<Chromosome, Chromosome>> future = executor.submit(new GATask(genome, selectionMethod, crossoverMethod, crossoverProbability, mutationProbability));
 				tasks.add(future);
 			}
 
 			/*
 			 * Retrieve the results.
 			 */
-			for (Future<List<Chromosome>> task : tasks) {
+			for (Future<Pair<Chromosome,Chromosome>> task : tasks) {
 				try {
 
-					List<Chromosome> offsprings = task.get();
-					children.addAll(offsprings);
+					Pair<Chromosome, Chromosome> offsprings = task.get();
+					children.add(offsprings.getFirst());
+					children.add(offsprings.getSecond());
 
-					for (Chromosome child : offsprings) {
+					Chromosome[] offspringsTmp = new Chromosome[] {offsprings.getFirst(),offsprings.getSecond()};
+					
+					for (Chromosome child : offspringsTmp) {
 						/*
 						 * Update the fittest.
 						 */

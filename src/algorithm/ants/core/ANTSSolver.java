@@ -14,6 +14,16 @@ import model.AppSettings;
 import model.Instance;
 import model.Result.PartialResult;
 
+/**
+ * 
+ * The ANTS solver sets up some parameters according to the preferred user configuration then
+ * splits the problem into logical tasks processed by a fixed pool of threads. 
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 9:33:17 PM
+ *
+ */
 public class ANTSSolver {
 
 	private int maxIterations;

@@ -4,8 +4,20 @@ import java.util.Random;
 
 import algorithm.ga.core.Genome;
 
+/**
+ * 
+ * Simple tournament selection: chose the best solution from two randomly picked ones. 
+ * 
+ * @author acco
+ * 
+ * Jul 5, 2016 8:40:01 PM
+ *
+ */
 public class TournamentSelection implements SelectionMethod {
 
+	/*
+	 * Probability to chose the better.
+	 */
 	private double k;
 
 	public TournamentSelection() {
