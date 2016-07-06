@@ -12,6 +12,7 @@ import algorithm.ga.crossover.CrossoverMethod;
 import algorithm.ga.crossover.DoublePointCrossover;
 import algorithm.ga.crossover.SinglePointCrossover;
 import algorithm.ga.crossover.UniformCrossover;
+import algorithm.ga.selection.LinearRankSelection;
 import algorithm.ga.selection.MontecarloSelection;
 import algorithm.ga.selection.SelectionMethod;
 import algorithm.ga.selection.TournamentSelection;
@@ -24,12 +25,13 @@ import util.Pair;
 
 /**
  * 
- * The GA solver sets up some parameters according to the preferred user configuration then
- * splits the problem into logical tasks processed by a fixed pool of threads. 
+ * The GA solver sets up some parameters according to the preferred user
+ * configuration then splits the problem into logical tasks processed by a fixed
+ * pool of threads.
  * 
  * @author acco
  * 
- * Jul 5, 2016 9:29:27 PM
+ *         Jul 5, 2016 9:29:27 PM
  *
  */
 public class GASolver {
@@ -49,7 +51,7 @@ public class GASolver {
 	private boolean elitism;
 
 	private SharedAppData sd;
-	
+
 	private Genome genome;
 
 	public GASolver(Instance instance, SharedAppData sd) {
@@ -70,6 +72,9 @@ public class GASolver {
 			break;
 		case TOURNAMENT:
 			this.selectionMethod = new TournamentSelection();
+			break;
+		case RANK:
+			this.selectionMethod = new LinearRankSelection();
 			break;
 		default:
 			throw new IllegalStateException();
@@ -109,31 +114,32 @@ public class GASolver {
 
 		while (i < this.maxIterations && !sd.isStopped()) {
 
-			System.out.println(genome.getFitnessStandardDeviation());
-			
+			// System.out.println(genome.getFitnessStandardDeviation());
+
 			List<Chromosome> children = new ArrayList<Chromosome>();
-			LinkedList<Future<Pair<Chromosome,Chromosome>>> tasks = new LinkedList<>();
+			LinkedList<Future<Pair<Chromosome, Chromosome>>> tasks = new LinkedList<>();
 
 			/*
 			 * Submit the task.
 			 */
 			for (int p = 0; p < this.populationSize; p += 2) {
-				Future<Pair<Chromosome, Chromosome>> future = executor.submit(new GATask(genome, selectionMethod, crossoverMethod, crossoverProbability, mutationProbability));
+				Future<Pair<Chromosome, Chromosome>> future = executor.submit(new GATask(genome, selectionMethod,
+						crossoverMethod, crossoverProbability, mutationProbability));
 				tasks.add(future);
 			}
 
 			/*
 			 * Retrieve the results.
 			 */
-			for (Future<Pair<Chromosome,Chromosome>> task : tasks) {
+			for (Future<Pair<Chromosome, Chromosome>> task : tasks) {
 				try {
 
 					Pair<Chromosome, Chromosome> offsprings = task.get();
 					children.add(offsprings.getFirst());
 					children.add(offsprings.getSecond());
 
-					Chromosome[] offspringsTmp = new Chromosome[] {offsprings.getFirst(),offsprings.getSecond()};
-					
+					Chromosome[] offspringsTmp = new Chromosome[] { offsprings.getFirst(), offsprings.getSecond() };
+
 					for (Chromosome child : offspringsTmp) {
 						/*
 						 * Update the fittest.

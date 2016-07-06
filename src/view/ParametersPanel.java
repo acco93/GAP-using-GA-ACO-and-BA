@@ -265,7 +265,7 @@ public class ParametersPanel extends JPanel {
 		
 		antsPopulation = new JSpinner(new SpinnerNumberModel(200, 10, 1000, 2));
 		String antPopulationHint = "# of chromosomes";
-		mainPanel.add(ViewFactory.configPanel(populationTitle, gaPopulation, antPopulationHint));
+		mainPanel.add(ViewFactory.configPanel(populationTitle, antsPopulation, antPopulationHint));
 		
 
 		/*

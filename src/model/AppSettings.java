@@ -33,6 +33,8 @@ public class AppSettings {
 	public double antsBeta;
 	public double antsRho;
 	public SelectionType gaSelectionMethod;
+	private int bioIterations;
+	private int bioPopulation;
 	
 	private AppSettings(){
 		/*
@@ -58,6 +60,13 @@ public class AppSettings {
 		this.antsAlpha = 0.6;
 		this.antsBeta = 0.4;
 		this.antsRho = 0.4;
+		
+		/*
+		 * Bionomic
+		 */
+		this.bioIterations = 5000;
+		this.bioPopulation = 200;
+
 	}
 	
 	public static void resetDefault(){
