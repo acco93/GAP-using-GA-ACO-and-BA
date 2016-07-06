@@ -42,15 +42,22 @@ public class Logger {
 
 	public synchronized void gaInfo(String text){
 		for(LogViewer viewer:viewers){
-			viewer.gaInfo(".. [INFO] "+text);
+			viewer.gaInfo(".. [GA] "+text);
 		}
 	}
 	
 	public synchronized void antsInfo(String text){
 		for(LogViewer viewer:viewers){
-			viewer.antsInfo(".. [INFO] "+text);
+			viewer.antsInfo(".. [ANTS] "+text);
 		}
 	}
+	
+	public synchronized void baInfo(String text){
+		for(LogViewer viewer:viewers){
+			viewer.baInfo(".. [BA] "+text);
+		}
+	}
+	
 	
 	public synchronized void addLogViewer(LogViewer viewer) {
 		viewers.add(viewer);

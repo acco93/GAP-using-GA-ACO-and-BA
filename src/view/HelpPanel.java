@@ -52,10 +52,12 @@ public class HelpPanel extends JPanel {
 		
 		
 		this.append("..:: GENERAL DESCRIPTION ::..", titleStyle);
-		this.append("This application tries to solve simple generalized assignment"
-				+ " problem (GAP) instances using a genetic algorithm and an ACO-based algorithm.",null);
-		this.append("They will be called GA and ANTS respectively from now on.", null);
-		this.append("GA and ANTS parameters are configurable up to a certain level.", null);
+		this.append("This application tries to solve simple generalized assignment problem (GAP) instances using:",null);
+		this.append("- a genetic algorithm GA",null);
+		this.append("- a bionomic algorithm BA (GA variant)",null);
+		this.append("- an ACO-based algorithm ANTS.",null);
+		
+		this.append("GA, BA and ANTS algorithm parameters are configurable up to a certain level.", null);
 
 		this.newLine();
 		this.append("Public repository available at:",null);
@@ -89,7 +91,13 @@ public class HelpPanel extends JPanel {
 		this.append("..:: GA NOTES ::..", titleStyle);
 		this.newLine();
 		this.append("A lot of ideas have been taken from:", null);
-		this.append("P.C.Chu and J.E.Beasley (1996) A genetic algorithm for the generalised assignment problem", paperStyle);
+		this.append("P.C.Chu and J.E.Beasley (1996) A Genetic Algorithm for the Generalised Assignment Problem", paperStyle);
+		this.newLine();
+		
+		this.append("..:: BA NOTES ::..", titleStyle);
+		this.newLine();
+		this.append("Form more information:", null);
+		this.append("V. Maniezzo, A. Mingozzi and R.Baldacci (1998) A Bionomic Approach to the Capacitated p-Median Problem", paperStyle);
 		this.newLine();
 		
 		this.append("..:: ANTS NOTES ::..", titleStyle);

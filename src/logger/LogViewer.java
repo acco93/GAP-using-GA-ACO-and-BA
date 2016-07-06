@@ -34,4 +34,10 @@ public interface LogViewer {
 	 * @param text
 	 */
 	void antsInfo(String text);
+	
+	/**
+	 * Info related to BA.
+	 * @param text
+	 */
+	void baInfo(String text);
 }

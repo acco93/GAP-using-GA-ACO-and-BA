@@ -25,6 +25,8 @@ public class R {
 	public static final Color BACKGROUND_COLOR = new Color(161, 212, 144);
 	public static final Color GA_BACKGROUND_COLOR = new Color(158, 196, 188);
 	public static final Color ANTS_BACKGROUND_COLOR = new Color(247, 200, 207);
+	public static final Color BA_BACKGROUND_COLOR = new Color(234, 246, 200);
+	
 	
 	/*
 	 * Icons

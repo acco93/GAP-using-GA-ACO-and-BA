@@ -27,14 +27,13 @@ import controller.Controller;
 import logger.LogViewer;
 import logger.Logger;
 
-
 /**
  * 
  * Log panel.
  * 
  * @author acco
  * 
- * Jul 5, 2016 8:04:26 PM
+ *         Jul 5, 2016 8:04:26 PM
  *
  */
 public class ExecutionPanel extends JPanel implements LogViewer {
@@ -47,11 +46,12 @@ public class ExecutionPanel extends JPanel implements LogViewer {
 	private Style gaStyle;
 	private Style antsStyle;
 	private JScrollPane scroll;
+	private Style baStyle;
 
 	public ExecutionPanel(Controller controller) {
 
 		Logger.get().addLogViewer(this);
-		
+
 		this.setLayout(new BorderLayout());
 		this.setBackground(R.BACKGROUND_COLOR);
 
@@ -76,13 +76,9 @@ public class ExecutionPanel extends JPanel implements LogViewer {
 			});
 			bottomPanel.add(clearButton);
 		} catch (IOException e1) {
-		
+
 			e1.printStackTrace();
 		}
-		
-		
-
-		
 
 		this.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -92,23 +88,25 @@ public class ExecutionPanel extends JPanel implements LogViewer {
 		log.setBackground(R.BACKGROUND_COLOR);
 		doc = log.getStyledDocument();
 
-		DefaultCaret caret = (DefaultCaret)log.getCaret();
+		DefaultCaret caret = (DefaultCaret) log.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-		
+
 		errStyle = log.addStyle("Error style", null);
 		StyleConstants.setForeground(errStyle, Color.white);
 		StyleConstants.setBackground(errStyle, Color.red);
-		
-		
+
 		infoStyle = log.addStyle("Info style", null);
 		StyleConstants.setForeground(infoStyle, Color.black);
-		
+
 		gaStyle = log.addStyle("GA style", infoStyle);
-		StyleConstants.setBackground(gaStyle, new Color(158,196,188));
-		
+		StyleConstants.setBackground(gaStyle, R.GA_BACKGROUND_COLOR);
+
 		antsStyle = log.addStyle("ANTS style", infoStyle);
-		StyleConstants.setBackground(antsStyle, new Color(247,200,207));
-		
+		StyleConstants.setBackground(antsStyle, R.ANTS_BACKGROUND_COLOR);
+
+		baStyle = log.addStyle("BA style", infoStyle);
+		StyleConstants.setBackground(baStyle, R.BA_BACKGROUND_COLOR);
+
 		scroll = new JScrollPane(log);
 		scroll.setOpaque(false);
 		scroll.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -123,7 +121,6 @@ public class ExecutionPanel extends JPanel implements LogViewer {
 			e.printStackTrace();
 		}
 	}
-
 
 	@Override
 	public void info(String text) {
@@ -144,7 +141,11 @@ public class ExecutionPanel extends JPanel implements LogViewer {
 	public void antsInfo(String text) {
 		this.append(text, this.antsStyle);
 	}
-	
-	
+
+	@Override
+	public void baInfo(String text) {
+		this.append(text, this.baStyle);
+
+	}
 
 }

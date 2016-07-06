@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import algorithm.ants.core.ANTSSolver;
-import algorithm.bio.core.BioSolver;
+import algorithm.bio.core.BioSolverConcurrent;
+import algorithm.bio.core.BioSolverSequential;
 import algorithm.ga.core.GASolver;
 import controller.Controller;
 import controller.SharedAppData;
@@ -124,7 +125,7 @@ public class ComputeTask implements Runnable {
 							ANTSSolver ants = new ANTSSolver(instance, sd);
 							PartialResult antResult = ants.solve();
 
-							BioSolver bio = new BioSolver(instance, sd);
+							BioSolverSequential bio = new BioSolverSequential(instance, sd);
 							bio.solve();
 
 							result.merge(gaResult, Algorithm.GA);
