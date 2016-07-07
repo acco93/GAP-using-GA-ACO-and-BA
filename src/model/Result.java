@@ -2,75 +2,94 @@ package model;
 
 /**
  * 
- * A result object contains aggregate info describing the results of each algorithm.
- * NB: stopping the processing will cause an inconsistent result. The info about the missing algorithm will be zeroed.
+ * A result object contains aggregate info describing the results of each
+ * algorithm. NB: stopping the processing will cause an inconsistent result. The
+ * info about the missing algorithm will be zeroed.
  * 
  * @author acco
  * 
- * Jul 5, 2016 8:21:17 PM
+ *         Jul 5, 2016 8:21:17 PM
  *
  */
 public class Result {
 
-	enum Algorithm {
-		GA, ANTS
-	}
-		
 	private Instance instance;
+	private int runs;
+
 	private int gaBestValue;
 	private int antsBestValue;
+	private int bioBestValue;
 
 	private int gaValuesSum;
 	private int antsValuesSum;
-	private int runs;
+	private int bioValuesSum;
+
 	private double gaTimeSum;
 	private double antsTimeSum;
+	private double bioTimeSum;
 
-	public Result(Instance instance){
+	public Result(Instance instance) {
 		this.instance = instance;
 		this.runs = 0;
-		
+
 		this.gaBestValue = 0;
 		this.antsBestValue = 0;
-		
+		this.bioBestValue = 0;
+
 		this.gaValuesSum = 0;
 		this.antsValuesSum = 0;
-		
+		this.bioValuesSum = 0;
+
 		this.gaTimeSum = 0;
 		this.antsTimeSum = 0;
+		this.bioTimeSum = 0;
 	}
-	
+
 	/**
-	 * Merge a partial result.
-	 * @param result
-	 * @param algorithm
+	 * Merge results
+	 * 
+	 * @param gaResult
+	 * @param antsResult
+	 * @param bioResult
 	 */
-	public void merge(PartialResult result, Algorithm algorithm){
-		switch(algorithm){
-		case ANTS:
-			this.antsValuesSum+=result.getValue();
-			this.antsTimeSum+=result.getTimeElapsed();
-			if(result.getValue()>this.antsBestValue){
-				this.antsBestValue = result.getValue();
-			}
-			break;
-		case GA:
-			this.runs +=1;
-			this.gaValuesSum+=result.getValue();
-			this.gaTimeSum+=result.getTimeElapsed();
-			if(result.getValue()>this.gaBestValue){
-				this.gaBestValue = result.getValue();
-			}
-			break;
-		default:
-			throw new IllegalStateException();
-			
+	public void merge(PartialResult gaResult, PartialResult antsResult, PartialResult bioResult) {
+
+		/*
+		 * ANTS
+		 */
+		this.antsValuesSum += antsResult.getValue();
+		this.antsTimeSum += antsResult.getTimeElapsed();
+		if (antsResult.getValue() > this.antsBestValue) {
+			this.antsBestValue = antsResult.getValue();
 		}
+
+		/*
+		 * GA
+		 */
+
+		this.gaValuesSum += gaResult.getValue();
+		this.gaTimeSum += gaResult.getTimeElapsed();
+		if (gaResult.getValue() > this.gaBestValue) {
+			this.gaBestValue = gaResult.getValue();
+		}
+
+		/*
+		 * BIO
+		 */
+
+		this.bioValuesSum += bioResult.getValue();
+		this.bioTimeSum += bioResult.getTimeElapsed();
+		if (bioResult.getValue() > this.bioBestValue) {
+			this.bioBestValue = bioResult.getValue();
+		}
+
+		/*
+		 * General
+		 */
+		this.runs += 1;
+
 	}
-	
-	
-	
-	
+
 	public Instance getInstance() {
 		return instance;
 	}
@@ -83,75 +102,82 @@ public class Result {
 		return antsBestValue;
 	}
 
-	
+	public int getBioBestValue() {
+		return bioBestValue;
+	}
+
 	public double getGaAvgValue() {
-		if(runs == 0){
+		if (runs == 0) {
 			return 0;
 		}
-		return (double)gaValuesSum/runs;
+		return (double) gaValuesSum / runs;
 	}
 
 	public double getAntsAvgValue() {
-		if(runs == 0){
+		if (runs == 0) {
 			return 0;
 		}
-		return (double)antsValuesSum/runs;
+		return (double) antsValuesSum / runs;
+	}
+
+	public double getBioAvgValue() {
+		if (runs == 0) {
+			return 0;
+		}
+		return (double) bioValuesSum / runs;
 	}
 
 	public double getGaAvgTime() {
-		if(runs == 0){
+		if (runs == 0) {
 			return 0;
 		}
-		return gaTimeSum/runs;
-	}
-	
-	public double getAntsAvgTime() {
-		if(runs == 0){
-			return 0;
-		}
-		return antsTimeSum/runs;
+		return gaTimeSum / runs;
 	}
 
+	public double getAntsAvgTime() {
+		if (runs == 0) {
+			return 0;
+		}
+		return antsTimeSum / runs;
+	}
+
+	public double getBioAvgTime() {
+		if (runs == 0) {
+			return 0;
+		}
+		return bioTimeSum / runs;
+	}
 
 	public int getRuns() {
 		return this.runs;
 	}
-	
+
 	/**
 	 * Info actually produced by a single run.
 	 * 
 	 * @author acco
 	 * 
-	 * Jul 5, 2016 8:25:16 PM
+	 *         Jul 5, 2016 8:25:16 PM
 	 *
 	 */
-	public static class PartialResult{
-		
+	public static class PartialResult {
+
 		private int value;
 		private double timeElapsed;
-		
-		public PartialResult(int value, double timeElapsed){
+
+		public PartialResult(int value, double timeElapsed) {
 			this.value = value;
 			this.timeElapsed = timeElapsed;
 		}
-		
+
 		public int getValue() {
 			return value;
 		}
-		
+
 		public double getTimeElapsed() {
 			return timeElapsed;
 		}
-		
+
 	}
 
-
-
-
-
-
-
-	
-	
-	
 }

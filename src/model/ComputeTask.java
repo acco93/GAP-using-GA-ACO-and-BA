@@ -3,15 +3,14 @@ package model;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import algorithm.ants.core.ANTSSolver;
 import algorithm.bio.core.BioSolverConcurrent;
-import algorithm.bio.core.BioSolverSequential;
 import algorithm.ga.core.GASolver;
 import controller.Controller;
 import controller.SharedAppData;
 import logger.Logger;
-import model.Result.Algorithm;
 import model.Result.PartialResult;
 
 /**
@@ -109,7 +108,7 @@ public class ComputeTask implements Runnable {
 							 * New problem -> new Result
 							 */
 							result = new Result(instance);
-							results.put(instance.getName(), result);
+
 						}
 
 						/*
@@ -120,18 +119,20 @@ public class ComputeTask implements Runnable {
 							Logger.get().info("Run " + (r + 1) + "/" + AppSettings.get().runs);
 
 							GASolver ga = new GASolver(instance, sd);
-							PartialResult gaResult = ga.solve();
+							Optional<PartialResult> gaResult = ga.solve();
 
 							ANTSSolver ants = new ANTSSolver(instance, sd);
-							PartialResult antResult = ants.solve();
+							Optional<PartialResult> antsResult = ants.solve();
 
-							BioSolverSequential bio = new BioSolverSequential(instance, sd);
-							bio.solve();
+							BioSolverConcurrent bio = new BioSolverConcurrent(instance, sd);
+							Optional<PartialResult> bioResult = bio.solve();
 
-							result.merge(gaResult, Algorithm.GA);
-							result.merge(antResult, Algorithm.ANTS);
+							if (gaResult.isPresent() && antsResult.isPresent() && bioResult.isPresent()) {
+								result.merge(gaResult.get(), antsResult.get(), bioResult.get());
+								results.put(instance.getName(), result);
+								controller.refreshResults();
+							}
 
-							controller.refreshResults();
 						}
 
 					}
@@ -139,18 +140,19 @@ public class ComputeTask implements Runnable {
 				}
 			}
 
-			Logger.get().info("Done :)");
-
 			/*
 			 * Print some status info...
 			 */
 			if (sd.isStopped()) {
 				this.controller.setStatus(State.STOPPED);
+				Logger.get().info("Done (stopped)");
 			} else {
 				if (errors) {
 					this.controller.setStatus(State.COMPLETED_WITH_ERRORS);
+					Logger.get().info("Done (with errors)");
 				} else {
 					this.controller.setStatus(State.COMPLETED);
+					Logger.get().info("Done :]");
 				}
 			}
 

@@ -3,6 +3,7 @@ package algorithm.ga.core;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -101,11 +102,11 @@ public class GASolver {
 
 		this.maxIterations = s.gaIterations;
 
-		this.genome = new Genome(instance);
+		this.genome = new Genome(instance, s.gaPopulation);
 
 	}
 
-	public PartialResult solve() {
+	public Optional<PartialResult> solve() {
 		int i = 0;
 
 		Logger.get().gaInfo("GENETIC ALGORITHM ............. ");
@@ -171,10 +172,14 @@ public class GASolver {
 
 		double endTime = System.currentTimeMillis();
 
-		Logger.get().gaInfo("Fittest: " + genome.getFittest());
-		// Logger.get().info("Weakest: " + this.weakest);
-
-		PartialResult result = new PartialResult(genome.getFittest().fitnessCombination(), endTime - startTime);
+		Optional<PartialResult> result = Optional.empty();
+		
+		if(i==this.maxIterations){
+			result = Optional.of(new PartialResult(genome.getFittest().fitnessCombination(), endTime - startTime));
+			Logger.get().gaInfo("Fittest: " + genome.getFittest());
+		} else {
+			Logger.get().gaInfo("K.O.");
+		}
 
 		return result;
 	}

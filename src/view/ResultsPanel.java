@@ -111,7 +111,7 @@ public class ResultsPanel extends JPanel {
 	 * 
 	 * @author acco
 	 * 
-	 * Jul 5, 2016 8:04:26 AM
+	 *         Jul 5, 2016 8:04:26 AM
 	 *
 	 */
 	public class TableModel extends AbstractTableModel {
@@ -119,7 +119,8 @@ public class ResultsPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 
 		private String[] columnNames = { "Instance", "Runs", "GA best value", "GA avg value", "GA avg time (ms)",
-				"ANTS Best value", "ANTS avg value", "ANTS avg time (ms)" };
+				"ANTS Best value", "ANTS avg value", "ANTS avg time (ms)", "BIO Best value", "BIO avg value",
+				"BIO avg time (ms)" };
 
 		private List<Result> list;
 
@@ -132,7 +133,8 @@ public class ResultsPanel extends JPanel {
 		}
 
 		/**
-		 * Get the results (map), transform them into a list in order to display them in fixed order.
+		 * Get the results (map), transform them into a list in order to display
+		 * them in fixed order.
 		 */
 		public void refreshModel() {
 			Collection<Result> collection = this.controller.getResults().values();
@@ -180,6 +182,12 @@ public class ResultsPanel extends JPanel {
 				return result.getAntsAvgValue();
 			case 7:
 				return result.getAntsAvgTime();
+			case 8:
+				return result.getBioBestValue();
+			case 9:
+				return result.getBioAvgValue();
+			case 10:
+				return result.getBioAvgTime();
 			default:
 				return null;
 			}
@@ -193,13 +201,11 @@ public class ResultsPanel extends JPanel {
 	 * 
 	 * @author acco
 	 * 
-	 * Jul 5, 2016 8:06:48 AM
+	 *         Jul 5, 2016 8:06:48 AM
 	 *
 	 */
 	public class CellRenderer extends JLabel implements TableCellRenderer {
 
-		
-		
 		private static final long serialVersionUID = 1L;
 
 		public CellRenderer() {
@@ -220,6 +226,8 @@ public class ResultsPanel extends JPanel {
 					this.setBackground(R.GA_BACKGROUND_COLOR);
 				} else if (column > 4 & column <= 7) {
 					this.setBackground(R.ANTS_BACKGROUND_COLOR);
+				} else if (column > 7 && column <= 10) {
+					this.setBackground(R.BA_BACKGROUND_COLOR);
 				} else {
 					this.setBackground(R.BACKGROUND_COLOR);
 				}

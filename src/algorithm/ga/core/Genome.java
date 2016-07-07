@@ -27,8 +27,8 @@ public class Genome {
 	private Chromosome unfittest;
 	private Chromosome lastFittest;
 
-	public Genome(Instance instance) {
-		this.size = AppSettings.get().gaPopulation;
+	public Genome(Instance instance, int population) {
+		this.size = population;
 
 		this.fitnessSum = 0;
 		this.fitnessVariance = 0;
@@ -59,7 +59,7 @@ public class Genome {
 		this.updateStatistics();
 	}
 
-	public void updateStatistics() {
+	private void updateStatistics() {
 
 		this.fitnessSum = this.population.stream().mapToInt(c -> c.fitness()).sum();
 

@@ -2,11 +2,16 @@ package algorithm.bio.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.Executors;
 
 import algorithm.ga.core.Chromosome;
 import algorithm.ga.core.Genome;
+import algorithm.ga.crossover.CrossoverMethod;
+import algorithm.ga.crossover.DoublePointCrossover;
 import algorithm.ga.crossover.SinglePointCrossover;
+import algorithm.ga.crossover.UniformCrossover;
 import controller.SharedAppData;
 import logger.Logger;
 import model.AppSettings;
@@ -21,22 +26,38 @@ public class BioSolverSequential {
 
 	private int maxIterations;
 	private Genome genome;
-	private SinglePointCrossover crossoverMethod;
+	private CrossoverMethod crossoverMethod;
+	private double mutationProbability;
 
 	public BioSolverSequential(Instance instance, SharedAppData sd) {
-		this.instance = instance;
 		this.sd = sd;
 
 		AppSettings s = AppSettings.get();
 
+
 		this.maxIterations = s.gaIterations;
 
-		this.crossoverMethod = new SinglePointCrossover();
+		switch (s.baCrossoverMethod) {
+		case DOUBLE_POINT:
+			this.crossoverMethod = new DoublePointCrossover();
+			break;
+		case SINGLE_POINT:
+			this.crossoverMethod = new SinglePointCrossover();
+			break;
+		case UNIFORM:
+			this.crossoverMethod = new UniformCrossover();
+			break;
+		default:
+			throw new IllegalStateException();
+		}
 
-		this.genome = new Genome(instance);
+		this.genome = new Genome(instance,s.baPopulation);
+
+		this.mutationProbability = s.baMutationProbability;
+
 	}
 
-	public PartialResult solve() {
+	public Optional<PartialResult> solve() {
 
 		int it = 0;
 
@@ -45,17 +66,6 @@ public class BioSolverSequential {
 		double startTime = System.currentTimeMillis();
 
 		while (it < this.maxIterations && !sd.isStopped()) {
-		//	System.out.println("Iteration: " + it);
-			/*
-			 * Perform local searches.
-			 */
-			for (Chromosome c : this.genome.getPopulation()) {
-				c.localSearch();
-			}
-			/*
-			 * Force the statistics update.
-			 */
-			this.genome.updateStatistics();
 
 			/*
 			 * Compute the (dis)similarity function.
@@ -108,18 +118,17 @@ public class BioSolverSequential {
 			 * considered similar if dissimilarityA - dissimilarityB < delta
 			 */
 			double delta = dissimilarityAvg - 0.7 * dissimilarityStd;
-			
+
 			/*
 			 * 
 			 */
 
-			//System.out.println("Inclusion frequencies:");
+			// System.out.println("Inclusion frequencies:");
 			int[] inclusionFrequency = new int[this.genome.getSize()];
 			for (int i = 0; i < this.genome.getSize(); i++) {
 				/*
-				 * the worst solution has inclusion frequency = 1 
-				 * ...
-				 * the best solution has inclusion frequency = 4
+				 * the worst solution has inclusion frequency = 1 ... the best
+				 * solution has inclusion frequency = 4
 				 */
 				inclusionFrequency[i] = (int) Math.ceil(((i - 1) * 5 / (genome.getSize() - 1)) + 1);
 			}
@@ -186,13 +195,13 @@ public class BioSolverSequential {
 				 * The parents set is built now I've to generate some children
 				 */
 
-				//System.out.println("parents set size: " + parents.size());
+				// System.out.println("parents set size: " + parents.size());
 
 				for (int i = 0; i < parents.size(); i++) {
 					Chromosome chosen = parents.get(i);
 					int nextOffspring = i + 1;
 					int offspringCount = 0;
-					
+
 					/*
 					 * Consider all the parents (but not me!).
 					 */
@@ -216,6 +225,9 @@ public class BioSolverSequential {
 					/*
 					 * Eventually "chosen" is actually the chosen one!
 					 */
+					if (new Random().nextDouble() < this.mutationProbability) {
+						chosen.mutation();
+					}
 					chosen.localSearch();
 					offsprings.add(chosen);
 
@@ -235,12 +247,11 @@ public class BioSolverSequential {
 						genome.setUnfittest(chosen);
 					}
 
-					chosen.mutation();
 				}
 
 			}
 
-			//System.out.println("before replacing: " + offsprings.size());
+			// System.out.println("before replacing: " + offsprings.size());
 
 			/*
 			 * Replace the population
@@ -250,10 +261,17 @@ public class BioSolverSequential {
 			it++;
 		}
 
-		Logger.get().baInfo("Fittest: " + genome.getFittest());
+		double endTime = System.currentTimeMillis();
 
-		double stopTime = System.currentTimeMillis();
+		Optional<PartialResult> result = Optional.empty();
 
-		return null;
+		if (it == this.maxIterations) {
+			result = Optional.of(new PartialResult(genome.getFittest().fitnessCombination(), endTime - startTime));
+			Logger.get().baInfo("Fittest: " + genome.getFittest());
+		} else {
+			Logger.get().baInfo("K.O.");
+		}
+
+		return result;
 	}
 }

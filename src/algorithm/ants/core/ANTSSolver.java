@@ -3,6 +3,7 @@ package algorithm.ants.core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -76,13 +77,15 @@ public class ANTSSolver {
 
 	}
 
-	public PartialResult solve() {
+	public Optional<PartialResult> solve() {
 
 		Logger.get().antsInfo("ANTS ALGORITHM .............");
 
 		double startTime = System.currentTimeMillis();
 
-		for (int iteration = 0; iteration < maxIterations && !this.sd.isStopped(); iteration++) {
+		int iteration;
+		
+		for (iteration = 0; iteration < maxIterations && !this.sd.isStopped(); iteration++) {
 
 			/*
 			 * for(int x=0;x<this.instance.getJobsNum();x++){ for(int
@@ -132,9 +135,16 @@ public class ANTSSolver {
 
 		double endTime = System.currentTimeMillis();
 
-		Logger.get().antsInfo("Fittest: " + fittest);
+		
 
-		PartialResult result = new PartialResult(fittest.fitnessCombination(), endTime - startTime);
+		Optional<PartialResult> result = Optional.empty();
+
+		if (iteration == this.maxIterations) {
+			result = Optional.of(new PartialResult(fittest.fitnessCombination(), endTime - startTime));
+			Logger.get().antsInfo("Fittest: " + fittest);
+		} else {
+			Logger.get().antsInfo("K.O.");
+		}
 
 		return result;
 	}

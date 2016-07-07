@@ -2,6 +2,7 @@ package algorithm.bio.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -12,6 +13,8 @@ import algorithm.ga.core.Chromosome;
 import algorithm.ga.core.Genome;
 import algorithm.ga.crossover.CrossoverMethod;
 import algorithm.ga.crossover.DoublePointCrossover;
+import algorithm.ga.crossover.SinglePointCrossover;
+import algorithm.ga.crossover.UniformCrossover;
 import controller.SharedAppData;
 import logger.Logger;
 import model.AppSettings;
@@ -25,6 +28,8 @@ public class BioSolverConcurrent {
 	private int maxIterations;
 	private Genome genome;
 	private CrossoverMethod crossoverMethod;
+	private int tasksNum;
+	private double mutationProbability;
 
 	public BioSolverConcurrent(Instance instance, SharedAppData sd) {
 		this.sd = sd;
@@ -33,18 +38,31 @@ public class BioSolverConcurrent {
 
 		this.executor = Executors.newFixedThreadPool(s.threads);
 
-		this.maxIterations = s.gaIterations;
+		this.maxIterations = s.baIterations;
 
-		this.crossoverMethod = new DoublePointCrossover();
+		switch (s.baCrossoverMethod) {
+		case DOUBLE_POINT:
+			this.crossoverMethod = new DoublePointCrossover();
+			break;
+		case SINGLE_POINT:
+			this.crossoverMethod = new SinglePointCrossover();
+			break;
+		case UNIFORM:
+			this.crossoverMethod = new UniformCrossover();
+			break;
+		default:
+			throw new IllegalStateException();
+		}
 
-		this.genome = new Genome(instance);
+		this.genome = new Genome(instance, s.baPopulation);
+
+		this.mutationProbability = s.baMutationProbability;
+
+		this.tasksNum = s.threads;
 	}
 
-	public PartialResult solve() {
+	public Optional<PartialResult> solve() {
 
-		List<Future<Boolean>> localSearchTasks = new ArrayList<Future<Boolean>>();
-		List<Future<Double>> dissimilarityTasks = new ArrayList<Future<Double>>();
-		List<Future<Chromosome>> crossoverTasks = new ArrayList<Future<Chromosome>>();
 		int it = 0;
 
 		Logger.get().baInfo("BIONOMIC ALGORITHM ............. ");
@@ -52,55 +70,36 @@ public class BioSolverConcurrent {
 		double startTime = System.currentTimeMillis();
 
 		while (it < this.maxIterations && !sd.isStopped()) {
-			
-			
-			/*
-			 * Start concurrent local searches.
-			 */
-			for (Chromosome c : this.genome.getPopulation()) {
-				Future<Boolean> localSearchTask = this.executor.submit(() -> {
-					c.localSearch();
-					return true;
-				});
-				localSearchTasks.add(localSearchTask);
-			}
 
-			/*
-			 * Wait for results.
-			 */
-			for (int i = 0; i < localSearchTasks.size(); i++) {
-				try {
-					localSearchTasks.get(i).get();
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				}
-			}
-
-			/*
-			 * Force the statistics update.
-			 */
-			this.genome.updateStatistics();
+			int current = 0;
 
 			/*
 			 * Compute the (dis)similarity function (concurrently).
 			 */
 
-			double[][] dissimilarity = new double[genome.getSize()][genome.getSize()];
-			double dissimilaritySum = 0;
-			for (int i = 0; i < this.genome.getSize(); i++) {
-				Future<Double> task = this.executor.submit(new DissimilarityTask(genome, dissimilarity, i));
-				dissimilarityTasks.add(task);
-				// if (it > 2500)
-				// System.out.printf("%.2f", dissimilarity[i][j]);
-				// dissimilaritySum += dissimilarity[i][j];
+			// System.out.print("Computing dissimilarity matrix...");
 
-				// if (it > 2500)
-				// System.out.println();
+			List<Future<Double>> dissimilarityTasks = new ArrayList<Future<Double>>();
+
+			double[][] dissimilarity = new double[genome.getSize()][genome.getSize()];
+
+			int increment = this.genome.getSize() / this.tasksNum;
+			current = 0;
+			for (int i = 0; i < this.tasksNum - 1; i++) {
+				Future<Double> task = this.executor
+						.submit(new DissimilarityTask(genome, dissimilarity, current, current + increment));
+				dissimilarityTasks.add(task);
+				current += increment;
 			}
+
+			dissimilarityTasks.add(
+					this.executor.submit(new DissimilarityTask(genome, dissimilarity, current, this.genome.getSize())));
 
 			/*
 			 * Wait for the async computation
 			 */
+			double dissimilaritySum = 0;
+
 			for (int i = 0; i < dissimilarityTasks.size(); i++) {
 				try {
 					dissimilaritySum += dissimilarityTasks.get(i).get();
@@ -108,6 +107,15 @@ public class BioSolverConcurrent {
 					e.printStackTrace();
 				}
 			}
+
+//			for (int i = 0; i < this.genome.getSize(); i++) {
+//				for (int j = 0; j < this.genome.getSize(); j++) {
+//					System.out.printf("%.2f ", dissimilarity[i][j]);
+//				}
+//				System.out.println();
+//			}
+
+			// System.out.println("DONE");
 
 			/*
 			 * Compute the avg & std avoiding the matrix diagonal...
@@ -128,10 +136,6 @@ public class BioSolverConcurrent {
 			 * considered similar if dissimilarityA - dissimilarityB < delta
 			 */
 			double delta = dissimilarityAvg - 0.7 * dissimilarityStd;
-			// System.out.println("Delta " + delta);
-			/*
-			 * 
-			 */
 
 			// System.out.println("Inclusion frequencies:");
 			int[] inclusionFrequency = new int[this.genome.getSize()];
@@ -206,15 +210,17 @@ public class BioSolverConcurrent {
 				 * The parents set is built now I've to generate some children
 				 */
 
-				// System.out.println("parents set size: " + parents.size());
 
+				// System.out.print("Crossing over...");
+				List<Future<Chromosome>> crossoverTasks = new ArrayList<Future<Chromosome>>();
 				for (int i = 0; i < parents.size(); i++) {
-					Future<Chromosome> task = this.executor.submit(new CrossoverTask(i, parents, crossoverMethod));
+					Future<Chromosome> task = this.executor
+							.submit(new CrossoverTask(i, parents, crossoverMethod, this.mutationProbability));
 					crossoverTasks.add(task);
 				}
 
 				for (int i = 0; i < crossoverTasks.size(); i++) {
-					
+
 					try {
 						Chromosome chosen = crossoverTasks.get(i).get();
 
@@ -232,16 +238,14 @@ public class BioSolverConcurrent {
 							genome.setUnfittest(chosen);
 						}
 
-						chosen.mutation();
 					} catch (InterruptedException | ExecutionException e) {
 
 						e.printStackTrace();
 					}
 				}
 
-			}
 
-			// System.out.println("before replacing: " + offsprings.size());
+			}
 
 			/*
 			 * Replace the population
@@ -251,10 +255,17 @@ public class BioSolverConcurrent {
 			it++;
 		}
 
-		Logger.get().baInfo("Fittest: " + genome.getFittest());
+		double endTime = System.currentTimeMillis();
 
-		double stopTime = System.currentTimeMillis();
+		Optional<PartialResult> result = Optional.empty();
 
-		return null;
+		if (it == this.maxIterations) {
+			result = Optional.of(new PartialResult(genome.getFittest().fitnessCombination(), endTime - startTime));
+			Logger.get().baInfo("Fittest: " + genome.getFittest());
+		} else {
+			Logger.get().baInfo("K.O.");
+		}
+
+		return result;
 	}
 }
