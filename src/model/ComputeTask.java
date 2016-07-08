@@ -12,6 +12,7 @@ import controller.Controller;
 import controller.SharedAppData;
 import logger.Logger;
 import model.Result.PartialResult;
+import solver.Solver;
 
 /**
  * 
@@ -28,7 +29,6 @@ public class ComputeTask implements Runnable {
 	private Controller controller;
 	private Map<String, Result> results;
 	private SharedAppData sd;
-
 
 	public ComputeTask(List<File> filePaths, Controller controller, Map<String, Result> results, SharedAppData sd) {
 		this.filePaths = filePaths;
@@ -120,13 +120,13 @@ public class ComputeTask implements Runnable {
 
 							Logger.get().info("Run " + (r + 1) + "/" + AppSettings.get().runs);
 
-							GASolver ga = new GASolver(instance, sd);
+							Solver ga = new GASolver(instance, sd);
 							Optional<PartialResult> gaResult = ga.solve();
 
-							ANTSSolver ants = new ANTSSolver(instance, sd);
+							Solver ants = new ANTSSolver(instance, sd);
 							Optional<PartialResult> antsResult = ants.solve();
 
-							BASolverConcurrent bio = new BASolverConcurrent(instance, sd);
+							Solver bio = new BASolverConcurrent(instance, sd);
 							Optional<PartialResult> bioResult = bio.solve();
 
 							if (gaResult.isPresent() && antsResult.isPresent() && bioResult.isPresent()) {

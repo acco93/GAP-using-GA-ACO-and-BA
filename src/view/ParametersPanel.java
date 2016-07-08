@@ -604,12 +604,13 @@ public class ParametersPanel extends JPanel {
 	public void disableInput() {
 		this.resetButton.setEnabled(false);
 		this.applyButton.setEnabled(false);
+		this.debugButton.setEnabled(false);
 	}
 
 	public void enableInput() {
 		this.resetButton.setEnabled(true);
 		this.applyButton.setEnabled(true);
-
+		this.debugButton.setEnabled(true);
 	}
 
 }

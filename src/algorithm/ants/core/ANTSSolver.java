@@ -35,11 +35,14 @@ public class ANTSSolver extends AbstractSolver {
 	private Instance instance;
 	private Ant fittest;
 	private SharedAppData sd;
+	private int tasksNum;
 
 	public ANTSSolver(Instance instance, SharedAppData sd) {
 		this.instance = instance;
 		this.sd = sd;
 		AppSettings s = AppSettings.get();
+
+		this.tasksNum = s.threads;
 
 		/*
 		 * Read & set parameters.
@@ -73,7 +76,8 @@ public class ANTSSolver extends AbstractSolver {
 
 	}
 
-	public Optional<PartialResult> solve() {
+	@Override
+	protected Optional<PartialResult> process() {
 
 		Logger.get().antsInfo("ANTS ALGORITHM .............");
 
@@ -83,19 +87,25 @@ public class ANTSSolver extends AbstractSolver {
 
 		int iteration;
 
+		int increment = colony.size() / tasksNum;
+
 		for (iteration = 0; iteration < maxIterations && !this.sd.isStopped(); iteration++) {
 
 			debugWriteLine("Iteration: " + iteration);
 
 			LinkedList<Future<Boolean>> tasks = new LinkedList<>();
+
 			/*
 			 * Each ant constructs a solution.
 			 */
-			for (Ant ant : colony) {
-
-				Future<Boolean> future = executor.submit(new ANTSTask(ant));
+			int current = 0;
+			for (int i = 0; i < tasksNum; i++) {
+				Future<Boolean> future = executor.submit(new ANTSTask(colony, current, current + increment));
+				current += increment;
 				tasks.add(future);
 			}
+
+			tasks.add(executor.submit(new ANTSTask(colony, current, colony.size())));
 
 			for (Future<Boolean> task : tasks) {
 				try {
@@ -149,6 +159,7 @@ public class ANTSSolver extends AbstractSolver {
 		}
 
 		return result;
+
 	}
 
 }

@@ -10,7 +10,7 @@ import algorithm.ba.core.BASolverConcurrent;
 import algorithm.ga.core.GASolver;
 import controller.Controller;
 import controller.SharedAppData;
-import debug.Debugger;
+import debug.Inspector;
 import debug.DebuggerToFile;
 import logger.Logger;
 
@@ -19,7 +19,7 @@ public class DebugTask implements Runnable {
 	private List<File> filePaths;
 	private Controller controller;
 	private SharedAppData sd;
-	private Debugger debugger;
+	private Inspector debugger;
 
 	public DebugTask(List<File> filePaths, Controller controller, SharedAppData sd) {
 		this.filePaths = filePaths;

@@ -20,6 +20,15 @@ import model.Instance;
 import model.Result.PartialResult;
 import solver.AbstractSolver;
 
+/**
+ * 
+ * Bionomic solver, it tries to solve the instance using a bionomic approach.
+ * 
+ * @author acco
+ * 
+ *         Jul 8, 2016 3:43:48 PM
+ *
+ */
 public class BASolverConcurrent extends AbstractSolver {
 
 	private SharedAppData sd;
@@ -61,8 +70,8 @@ public class BASolverConcurrent extends AbstractSolver {
 		this.tasksNum = s.threads;
 	}
 
-	public Optional<PartialResult> solve() {
-
+	@Override
+	protected Optional<PartialResult> process() {
 		int it = 0;
 
 		Logger.get().baInfo("BIONOMIC ALGORITHM ............. ");

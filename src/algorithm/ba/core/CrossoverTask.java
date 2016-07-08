@@ -8,6 +8,15 @@ import algorithm.ga.core.Chromosome;
 import algorithm.ga.crossover.CrossoverMethod;
 import util.Pair;
 
+/**
+ * 
+ * Crossover among multiple parents.
+ * 
+ * @author acco
+ * 
+ *         Jul 8, 2016 3:44:37 PM
+ *
+ */
 public class CrossoverTask implements Callable<Chromosome> {
 
 	private int startIndex;
@@ -58,7 +67,7 @@ public class CrossoverTask implements Callable<Chromosome> {
 		}
 
 		chosen.localSearch();
-		
+
 		return chosen;
 	}
 

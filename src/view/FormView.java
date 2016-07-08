@@ -82,7 +82,7 @@ public class FormView extends JFrame implements View {
 		
 		JSplitPane outerPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fsPanel, innerPanel);
 		
-		tabbedPane.addTab("File selection & execution", outerPanel);
+		tabbedPane.addTab("Workspace", outerPanel);
 
 
 		this.add(mainPanel);

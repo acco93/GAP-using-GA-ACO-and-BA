@@ -6,14 +6,24 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import debug.Debuggable;
-import debug.Debugger;
+import debug.Inspectable;
+import debug.Inspector;
 import model.AppSettings;
 import model.Result.PartialResult;
 
-public abstract class AbstractSolver implements Solver, Debuggable {
+/**
+ * 
+ * Solver interface implementation. It defines a generic solver implementation
+ * providing some useful methods & components (executor).
+ * 
+ * @author acco
+ * 
+ *         Jul 8, 2016 3:35:17 PM
+ *
+ */
+public abstract class AbstractSolver implements Solver, Inspectable {
 
-	private Set<Debugger> debuggers;
+	private Set<Inspector> debuggers;
 	protected ExecutorService executor;
 
 	public AbstractSolver() {
@@ -22,21 +32,38 @@ public abstract class AbstractSolver implements Solver, Debuggable {
 	}
 
 	@Override
-	public abstract Optional<PartialResult> solve();
+	public Optional<PartialResult> solve() {
+		preProcess();
+		Optional<PartialResult> result = process();
+		postProcess();
+		this.executor.shutdown();
+
+		return result;
+	}
+
+	protected void postProcess() {
+
+	}
+
+	protected void preProcess() {
+
+	}
+
+	protected abstract Optional<PartialResult> process();
 
 	@Override
-	public void attach(Debugger debugger) {
+	public void attach(Inspector debugger) {
 		this.debuggers.add(debugger);
 	}
 
 	public void debugWrite(String text) {
-		for (Debugger d : debuggers) {
+		for (Inspector d : debuggers) {
 			d.write(text);
 		}
 	}
 
 	public void debugWriteLine(String text) {
-		for (Debugger d : debuggers) {
+		for (Inspector d : debuggers) {
 			d.writeLine(text);
 		}
 	}

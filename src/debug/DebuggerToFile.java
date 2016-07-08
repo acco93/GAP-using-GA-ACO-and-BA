@@ -6,7 +6,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 
-public class DebuggerToFile implements Debugger {
+/**
+ * Inspector implementation as logger to file.
+ * 
+ * @author acco
+ * 
+ *         Jul 8, 2016 3:43:02 PM
+ *
+ */
+public class DebuggerToFile implements Inspector {
 
 	private File file;
 	private BufferedWriter output;
@@ -50,11 +58,6 @@ public class DebuggerToFile implements Debugger {
 			e.printStackTrace();
 		}
 
-	}
-
-	@Override
-	public boolean isNull() {
-		return false;
 	}
 
 	@Override

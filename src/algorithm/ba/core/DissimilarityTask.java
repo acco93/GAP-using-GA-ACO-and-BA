@@ -4,6 +4,15 @@ import java.util.concurrent.Callable;
 
 import algorithm.ga.core.Genome;
 
+/**
+ * 
+ * Compute & quantify differences between solution.
+ * 
+ * @author acco
+ * 
+ *         Jul 8, 2016 3:45:14 PM
+ *
+ */
 public class DissimilarityTask implements Callable<Double> {
 
 	private Genome genome;

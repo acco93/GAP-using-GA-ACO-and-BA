@@ -100,7 +100,8 @@ public class GASolver extends AbstractSolver {
 
 	}
 
-	public Optional<PartialResult> solve() {
+	@Override
+	protected Optional<PartialResult> process() {
 		int i = 0;
 
 		Logger.get().gaInfo("GENETIC ALGORITHM ............. ");
@@ -181,7 +182,7 @@ public class GASolver extends AbstractSolver {
 		} else {
 			Logger.get().gaInfo("K.O.");
 		}
-
+		
 		return result;
 	}
 
