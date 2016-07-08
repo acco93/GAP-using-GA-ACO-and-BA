@@ -1,13 +1,10 @@
-package algorithm.bio.core;
+package algorithm.ba.core;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import algorithm.ga.core.Chromosome;
 import algorithm.ga.core.Genome;
@@ -20,25 +17,25 @@ import logger.Logger;
 import model.AppSettings;
 import model.Instance;
 import model.Result.PartialResult;
+import util.Pair;
 
-public class BioSolverConcurrent {
+public class BASolverSequential {
 
+	private Instance instance;
 	private SharedAppData sd;
-	private ExecutorService executor;
+
 	private int maxIterations;
 	private Genome genome;
 	private CrossoverMethod crossoverMethod;
-	private int tasksNum;
 	private double mutationProbability;
 
-	public BioSolverConcurrent(Instance instance, SharedAppData sd) {
+	public BASolverSequential(Instance instance, SharedAppData sd) {
 		this.sd = sd;
 
 		AppSettings s = AppSettings.get();
 
-		this.executor = Executors.newFixedThreadPool(s.threads);
 
-		this.maxIterations = s.baIterations;
+		this.maxIterations = s.gaIterations;
 
 		switch (s.baCrossoverMethod) {
 		case DOUBLE_POINT:
@@ -54,11 +51,10 @@ public class BioSolverConcurrent {
 			throw new IllegalStateException();
 		}
 
-		this.genome = new Genome(instance, s.baPopulation);
+		this.genome = new Genome(instance,s.baPopulation);
 
 		this.mutationProbability = s.baMutationProbability;
 
-		this.tasksNum = s.threads;
 	}
 
 	public Optional<PartialResult> solve() {
@@ -71,51 +67,37 @@ public class BioSolverConcurrent {
 
 		while (it < this.maxIterations && !sd.isStopped()) {
 
-			int current = 0;
-
 			/*
-			 * Compute the (dis)similarity function (concurrently).
+			 * Compute the (dis)similarity function.
 			 */
-
-			// System.out.print("Computing dissimilarity matrix...");
-
-			List<Future<Double>> dissimilarityTasks = new ArrayList<Future<Double>>();
 
 			double[][] dissimilarity = new double[genome.getSize()][genome.getSize()];
-
-			int increment = this.genome.getSize() / this.tasksNum;
-			current = 0;
-			for (int i = 0; i < this.tasksNum - 1; i++) {
-				Future<Double> task = this.executor
-						.submit(new DissimilarityTask(genome, dissimilarity, current, current + increment));
-				dissimilarityTasks.add(task);
-				current += increment;
-			}
-
-			dissimilarityTasks.add(
-					this.executor.submit(new DissimilarityTask(genome, dissimilarity, current, this.genome.getSize())));
-
-			/*
-			 * Wait for the async computation
-			 */
 			double dissimilaritySum = 0;
-
-			for (int i = 0; i < dissimilarityTasks.size(); i++) {
-				try {
-					dissimilaritySum += dissimilarityTasks.get(i).get();
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
+			for (int i = 0; i < this.genome.getSize(); i++) {
+				for (int j = 0; j < this.genome.getSize(); j++) {
+					int diff = 0;
+					int[] arrayA = this.genome.getOrderedPopulation().get(i).getArray();
+					int[] arrayB = this.genome.getOrderedPopulation().get(j).getArray();
+					/*
+					 * Increment diff each time a job is assigned to a different
+					 * agent.
+					 */
+					for (int k = 0; k < this.instance.getJobsNum(); k++) {
+						if (arrayA[k] != arrayB[k]) {
+							diff++;
+						}
+					}
+					/*
+					 * diff is normalized according to the jobs number.
+					 */
+					dissimilarity[i][j] = ((double) diff / this.instance.getJobsNum());
+					// if (it > 2500)
+					// System.out.printf("%.2f", dissimilarity[i][j]);
+					dissimilaritySum += dissimilarity[i][j];
 				}
+				// if (it > 2500)
+				// System.out.println();
 			}
-
-//			for (int i = 0; i < this.genome.getSize(); i++) {
-//				for (int j = 0; j < this.genome.getSize(); j++) {
-//					System.out.printf("%.2f ", dissimilarity[i][j]);
-//				}
-//				System.out.println();
-//			}
-
-			// System.out.println("DONE");
 
 			/*
 			 * Compute the avg & std avoiding the matrix diagonal...
@@ -137,15 +119,18 @@ public class BioSolverConcurrent {
 			 */
 			double delta = dissimilarityAvg - 0.7 * dissimilarityStd;
 
+			/*
+			 * 
+			 */
+
 			// System.out.println("Inclusion frequencies:");
 			int[] inclusionFrequency = new int[this.genome.getSize()];
 			for (int i = 0; i < this.genome.getSize(); i++) {
 				/*
 				 * the worst solution has inclusion frequency = 1 ... the best
-				 * solution has inclusion frequency = 5
+				 * solution has inclusion frequency = 4
 				 */
 				inclusionFrequency[i] = (int) Math.ceil(((i - 1) * 5 / (genome.getSize() - 1)) + 1);
-				// System.out.println(inclusionFrequency[i]);
 			}
 
 			List<Chromosome> offsprings = new ArrayList<>();
@@ -210,42 +195,63 @@ public class BioSolverConcurrent {
 				 * The parents set is built now I've to generate some children
 				 */
 
+				// System.out.println("parents set size: " + parents.size());
 
-				// System.out.print("Crossing over...");
-				List<Future<Chromosome>> crossoverTasks = new ArrayList<Future<Chromosome>>();
 				for (int i = 0; i < parents.size(); i++) {
-					Future<Chromosome> task = this.executor
-							.submit(new CrossoverTask(i, parents, crossoverMethod, this.mutationProbability));
-					crossoverTasks.add(task);
-				}
+					Chromosome chosen = parents.get(i);
+					int nextOffspring = i + 1;
+					int offspringCount = 0;
 
-				for (int i = 0; i < crossoverTasks.size(); i++) {
-
-					try {
-						Chromosome chosen = crossoverTasks.get(i).get();
-
-						offsprings.add(chosen);
+					/*
+					 * Consider all the parents (but not me!).
+					 */
+					while (offspringCount < parents.size()) {
 						/*
-						 * Update the fittest.
+						 * Generate two children.
 						 */
-						if (chosen.fitnessCombination() > genome.getFittest().fitnessCombination()) {
-							genome.setFittest(chosen);
-						}
+						Pair<Chromosome, Chromosome> children = this.crossoverMethod.apply(chosen,
+								parents.get((nextOffspring) % parents.size()));
 						/*
-						 * Update the weakest.
+						 * Choose one randomly.
 						 */
-						else if (chosen.fitnessCombination() < genome.getUnfittest().fitnessCombination()) {
-							genome.setUnfittest(chosen);
+						if (new Random().nextBoolean()) {
+							chosen = children.getFirst();
+						} else {
+							chosen = children.getSecond();
 						}
-
-					} catch (InterruptedException | ExecutionException e) {
-
-						e.printStackTrace();
+						nextOffspring++;
+						offspringCount++;
 					}
-				}
+					/*
+					 * Eventually "chosen" is actually the chosen one!
+					 */
+					if (new Random().nextDouble() < this.mutationProbability) {
+						chosen.mutation();
+					}
+					chosen.localSearch();
+					offsprings.add(chosen);
 
+					/*
+					 * Update fittest & unfittest
+					 */
+					/*
+					 * Update the fittest.
+					 */
+					if (chosen.fitnessCombination() > genome.getFittest().fitnessCombination()) {
+						genome.setFittest(chosen);
+					}
+					/*
+					 * Update the weakest.
+					 */
+					else if (chosen.fitnessCombination() < genome.getUnfittest().fitnessCombination()) {
+						genome.setUnfittest(chosen);
+					}
+
+				}
 
 			}
+
+			// System.out.println("before replacing: " + offsprings.size());
 
 			/*
 			 * Replace the population

@@ -10,15 +10,15 @@ import javax.swing.ImageIcon;
 
 /**
  * 
- * Values used across different ui components.
- * R = resources
+ * Values used across different ui components. R = resources
+ * 
  * @author acco
  * 
- * Jul 5, 2016 7:37:06 AM
+ *         Jul 5, 2016 7:37:06 AM
  *
  */
 public class R {
-	
+
 	/*
 	 * Colors
 	 */
@@ -26,8 +26,7 @@ public class R {
 	public static final Color GA_BACKGROUND_COLOR = new Color(158, 196, 188);
 	public static final Color ANTS_BACKGROUND_COLOR = new Color(247, 200, 207);
 	public static final Color BA_BACKGROUND_COLOR = new Color(234, 246, 200);
-	
-	
+
 	/*
 	 * Icons
 	 */
@@ -35,21 +34,21 @@ public class R {
 	public static Icon STOP_ICON;
 	public static Icon EXPORT_ICON;
 	public static Icon CLEAR_ICON;
-	public static ImageIcon HELP_ICON;
-	
-	
-	static{
+	public static ImageIcon RECORD_ICON;
+
+	static {
 		try {
-		
+
 			START_ICON = new ImageIcon(ImageIO.read(new File("icons/Play.png")));
 			STOP_ICON = new ImageIcon(ImageIO.read(new File("icons/Stop.png")));
 			EXPORT_ICON = new ImageIcon(ImageIO.read(new File("icons/ExportToDocument.png")));
 			CLEAR_ICON = new ImageIcon(ImageIO.read(new File("icons/MinusRedButton.png")));
-			HELP_ICON = new ImageIcon(ImageIO.read(new File("icons/HelpBlueButton.png")));
+			RECORD_ICON = new ImageIcon(ImageIO.read(new File("icons/RecordButton.png")));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 }

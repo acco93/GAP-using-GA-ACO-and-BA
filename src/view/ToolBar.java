@@ -14,16 +14,18 @@ import io.ExportResultsTask;
  * 
  * @author acco
  * 
- * Jul 5, 2016 7:44:49 AM
+ *         Jul 5, 2016 7:44:49 AM
  *
  */
 public class ToolBar extends JToolBar {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private JButton startButton;
 	private JButton stopButton;
 	private JButton exportButton;
+
+	private JButton recordButton;
 
 	public ToolBar(Controller controller) {
 
@@ -39,9 +41,25 @@ public class ToolBar extends JToolBar {
 
 		startButton.addActionListener((e) -> {
 			stopButton.setEnabled(true);
+			recordButton.setEnabled(false);
 			controller.start();
 		});
 		this.add(startButton);
+
+		/*
+		 * Record button.
+		 */
+		recordButton = new JButton(R.RECORD_ICON);
+		recordButton.setToolTipText(
+				"Start processing & write detailed log to file (please make sure to use few iterations & small population)");
+		recordButton.setContentAreaFilled(false);
+
+		recordButton.addActionListener((e) -> {
+			stopButton.setEnabled(true);
+			startButton.setEnabled(false);
+			controller.record();
+		});
+		this.add(recordButton);
 
 		/*
 		 * Stop button.
@@ -62,7 +80,6 @@ public class ToolBar extends JToolBar {
 		 */
 		this.add(Box.createHorizontalGlue());
 
-
 		/*
 		 * Export button.
 		 */
@@ -71,10 +88,11 @@ public class ToolBar extends JToolBar {
 		exportButton.setContentAreaFilled(false);
 
 		exportButton.addActionListener((e) -> {
-			if(controller.getResults().isEmpty()){
-				JOptionPane.showMessageDialog (null, "Mmmmm no results?!", "Ops... Nothing to export", JOptionPane.WARNING_MESSAGE);
+			if (controller.getResults().isEmpty()) {
+				JOptionPane.showMessageDialog(null, "Mmmmm no results?!", "Ops... Nothing to export",
+						JOptionPane.WARNING_MESSAGE);
 			} else {
-				new Thread(new ExportResultsTask(controller.getResults())).start();				
+				new Thread(new ExportResultsTask(controller.getResults())).start();
 			}
 		});
 		this.add(exportButton);
@@ -87,6 +105,7 @@ public class ToolBar extends JToolBar {
 	public void disableInput() {
 		this.startButton.setEnabled(false);
 		this.exportButton.setEnabled(false);
+		this.recordButton.setEnabled(false);
 		this.stopButton.setEnabled(true);
 	}
 
@@ -96,6 +115,7 @@ public class ToolBar extends JToolBar {
 	public void enableInput() {
 		this.startButton.setEnabled(true);
 		this.exportButton.setEnabled(true);
+		this.recordButton.setEnabled(true);
 		this.stopButton.setEnabled(false);
 	}
 

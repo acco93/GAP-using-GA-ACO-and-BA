@@ -1,4 +1,4 @@
-package algorithm.bio.core;
+package algorithm.ba.core;
 
 import java.util.concurrent.Callable;
 

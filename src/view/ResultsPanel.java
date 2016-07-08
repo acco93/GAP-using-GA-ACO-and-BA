@@ -118,9 +118,9 @@ public class ResultsPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
-		private String[] columnNames = { "Instance", "Runs", "GA best value", "GA avg value", "GA avg time (ms)",
-				"ANTS Best value", "ANTS avg value", "ANTS avg time (ms)", "BIO Best value", "BIO avg value",
-				"BIO avg time (ms)" };
+		private String[] columnNames = { "Instance", "Runs", "GA z*", "GA avg z ", "GA avg t (ms)",
+				"ANTS z*", "ANTS avg z", "ANTS avg t (ms)", "BA z*", "BA avg z",
+				"BA avg t (ms)" };
 
 		private List<Result> list;
 
@@ -183,11 +183,11 @@ public class ResultsPanel extends JPanel {
 			case 7:
 				return result.getAntsAvgTime();
 			case 8:
-				return result.getBioBestValue();
+				return result.getBaBestValue();
 			case 9:
-				return result.getBioAvgValue();
+				return result.getBaAvgValue();
 			case 10:
-				return result.getBioAvgTime();
+				return result.getBaAvgTime();
 			default:
 				return null;
 			}

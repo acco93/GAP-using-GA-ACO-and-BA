@@ -1,10 +1,11 @@
-package algorithm.bio.core;
+package algorithm.ba.core;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import algorithm.ga.core.Chromosome;
 import algorithm.ga.core.Genome;
@@ -17,25 +18,25 @@ import logger.Logger;
 import model.AppSettings;
 import model.Instance;
 import model.Result.PartialResult;
-import util.Pair;
+import solver.AbstractSolver;
 
-public class BioSolverSequential {
+public class BASolverConcurrent extends AbstractSolver {
 
-	private Instance instance;
 	private SharedAppData sd;
-
 	private int maxIterations;
 	private Genome genome;
 	private CrossoverMethod crossoverMethod;
+	private int tasksNum;
 	private double mutationProbability;
+	private int maxInclusionFrequency;
+	private double similarityConstant;
 
-	public BioSolverSequential(Instance instance, SharedAppData sd) {
+	public BASolverConcurrent(Instance instance, SharedAppData sd) {
 		this.sd = sd;
 
 		AppSettings s = AppSettings.get();
 
-
-		this.maxIterations = s.gaIterations;
+		this.maxIterations = s.baIterations;
 
 		switch (s.baCrossoverMethod) {
 		case DOUBLE_POINT:
@@ -51,10 +52,13 @@ public class BioSolverSequential {
 			throw new IllegalStateException();
 		}
 
-		this.genome = new Genome(instance,s.baPopulation);
+		this.genome = new Genome(instance, s.baPopulation);
 
+		this.maxInclusionFrequency = s.baMaxInclusionFrequency;
+		this.similarityConstant = s.baSimilarityConstant;
 		this.mutationProbability = s.baMutationProbability;
 
+		this.tasksNum = s.threads;
 	}
 
 	public Optional<PartialResult> solve() {
@@ -63,40 +67,60 @@ public class BioSolverSequential {
 
 		Logger.get().baInfo("BIONOMIC ALGORITHM ............. ");
 
+		debugWriteLine("Computing bionomic algorithm");
+
 		double startTime = System.currentTimeMillis();
 
 		while (it < this.maxIterations && !sd.isStopped()) {
 
+			debugWriteLine("Iteration: " + it);
+			debugWriteLine("Fitness mean: " + genome.getFitnessMean());
+			debugWriteLine("Fitness variance: " + genome.getFitnessVariance());
+			debugWriteLine("Fitness std: " + genome.getFitnessStandardDeviation());
+
+			int current = 0;
+
 			/*
-			 * Compute the (dis)similarity function.
+			 * Compute the (dis)similarity function (concurrently).
 			 */
 
+			List<Future<Double>> dissimilarityTasks = new ArrayList<Future<Double>>();
+
 			double[][] dissimilarity = new double[genome.getSize()][genome.getSize()];
+
+			int increment = this.genome.getSize() / this.tasksNum;
+			current = 0;
+			for (int i = 0; i < this.tasksNum - 1; i++) {
+				Future<Double> task = this.executor
+						.submit(new DissimilarityTask(genome, dissimilarity, current, current + increment));
+				dissimilarityTasks.add(task);
+				current += increment;
+			}
+
+			dissimilarityTasks.add(
+					this.executor.submit(new DissimilarityTask(genome, dissimilarity, current, this.genome.getSize())));
+
+			/*
+			 * Wait for the async computation
+			 */
 			double dissimilaritySum = 0;
-			for (int i = 0; i < this.genome.getSize(); i++) {
-				for (int j = 0; j < this.genome.getSize(); j++) {
-					int diff = 0;
-					int[] arrayA = this.genome.getOrderedPopulation().get(i).getArray();
-					int[] arrayB = this.genome.getOrderedPopulation().get(j).getArray();
-					/*
-					 * Increment diff each time a job is assigned to a different
-					 * agent.
-					 */
-					for (int k = 0; k < this.instance.getJobsNum(); k++) {
-						if (arrayA[k] != arrayB[k]) {
-							diff++;
-						}
-					}
-					/*
-					 * diff is normalized according to the jobs number.
-					 */
-					dissimilarity[i][j] = ((double) diff / this.instance.getJobsNum());
-					// if (it > 2500)
-					// System.out.printf("%.2f", dissimilarity[i][j]);
-					dissimilaritySum += dissimilarity[i][j];
+
+			for (int i = 0; i < dissimilarityTasks.size(); i++) {
+				try {
+					dissimilaritySum += dissimilarityTasks.get(i).get();
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
 				}
-				// if (it > 2500)
-				// System.out.println();
+			}
+
+			if (super.areThereDebuggers()) {
+				debugWriteLine("Dissimilarity matrix:");
+				for (int i = 0; i < this.genome.getSize(); i++) {
+					for (int j = 0; j < this.genome.getSize(); j++) {
+						debugWrite(String.format("%.3f ", dissimilarity[i][j]));
+					}
+					debugWriteLine("");
+				}
 			}
 
 			/*
@@ -113,24 +137,25 @@ public class BioSolverSequential {
 			dissimilarityStd /= this.genome.getSize();
 			dissimilarityStd = Math.sqrt(dissimilarityStd);
 
+			debugWriteLine("Dissimilarity avg: " + dissimilarityAvg);
+			debugWriteLine("Dissimilarity std: " + dissimilarityStd);
+
 			/*
 			 * Define the similarity threshold. Two solutions A, B are
 			 * considered similar if dissimilarityA - dissimilarityB < delta
 			 */
-			double delta = dissimilarityAvg - 0.7 * dissimilarityStd;
+			double delta = dissimilarityAvg - this.similarityConstant * dissimilarityStd;
 
-			/*
-			 * 
-			 */
+			debugWriteLine("Delta: " + delta);
 
-			// System.out.println("Inclusion frequencies:");
 			int[] inclusionFrequency = new int[this.genome.getSize()];
 			for (int i = 0; i < this.genome.getSize(); i++) {
 				/*
 				 * the worst solution has inclusion frequency = 1 ... the best
-				 * solution has inclusion frequency = 4
+				 * solution has inclusion frequency = maxInclusionFrequences
 				 */
-				inclusionFrequency[i] = (int) Math.ceil(((i - 1) * 5 / (genome.getSize() - 1)) + 1);
+				inclusionFrequency[i] = (int) Math
+						.ceil(((i - 1) * this.maxInclusionFrequency / (genome.getSize() - 1)) + 1);
 			}
 
 			List<Chromosome> offsprings = new ArrayList<>();
@@ -195,63 +220,41 @@ public class BioSolverSequential {
 				 * The parents set is built now I've to generate some children
 				 */
 
-				// System.out.println("parents set size: " + parents.size());
+				debugWriteLine("Parents set cardinality: " + parents.size());
 
+				List<Future<Chromosome>> crossoverTasks = new ArrayList<Future<Chromosome>>();
 				for (int i = 0; i < parents.size(); i++) {
-					Chromosome chosen = parents.get(i);
-					int nextOffspring = i + 1;
-					int offspringCount = 0;
+					Future<Chromosome> task = this.executor
+							.submit(new CrossoverTask(i, parents, crossoverMethod, this.mutationProbability));
+					crossoverTasks.add(task);
+				}
 
-					/*
-					 * Consider all the parents (but not me!).
-					 */
-					while (offspringCount < parents.size()) {
+				for (int i = 0; i < crossoverTasks.size(); i++) {
+
+					try {
+						Chromosome chosen = crossoverTasks.get(i).get();
+
+						offsprings.add(chosen);
 						/*
-						 * Generate two children.
+						 * Update the fittest.
 						 */
-						Pair<Chromosome, Chromosome> children = this.crossoverMethod.apply(chosen,
-								parents.get((nextOffspring) % parents.size()));
-						/*
-						 * Choose one randomly.
-						 */
-						if (new Random().nextBoolean()) {
-							chosen = children.getFirst();
-						} else {
-							chosen = children.getSecond();
+						if (chosen.fitnessCombination() > genome.getFittest().fitnessCombination()) {
+							genome.setFittest(chosen);
 						}
-						nextOffspring++;
-						offspringCount++;
-					}
-					/*
-					 * Eventually "chosen" is actually the chosen one!
-					 */
-					if (new Random().nextDouble() < this.mutationProbability) {
-						chosen.mutation();
-					}
-					chosen.localSearch();
-					offsprings.add(chosen);
+						/*
+						 * Update the weakest.
+						 */
+						else if (chosen.fitnessCombination() < genome.getUnfittest().fitnessCombination()) {
+							genome.setUnfittest(chosen);
+						}
 
-					/*
-					 * Update fittest & unfittest
-					 */
-					/*
-					 * Update the fittest.
-					 */
-					if (chosen.fitnessCombination() > genome.getFittest().fitnessCombination()) {
-						genome.setFittest(chosen);
-					}
-					/*
-					 * Update the weakest.
-					 */
-					else if (chosen.fitnessCombination() < genome.getUnfittest().fitnessCombination()) {
-						genome.setUnfittest(chosen);
-					}
+					} catch (InterruptedException | ExecutionException e) {
 
+						e.printStackTrace();
+					}
 				}
 
 			}
-
-			// System.out.println("before replacing: " + offsprings.size());
 
 			/*
 			 * Replace the population
@@ -259,6 +262,8 @@ public class BioSolverSequential {
 			this.genome.setPopulation(offsprings);
 
 			it++;
+
+			debugWriteLine("");
 		}
 
 		double endTime = System.currentTimeMillis();
@@ -274,4 +279,5 @@ public class BioSolverSequential {
 
 		return result;
 	}
+
 }

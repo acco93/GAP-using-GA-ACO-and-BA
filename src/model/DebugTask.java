@@ -1,45 +1,39 @@
 package model;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import algorithm.ants.core.ANTSSolver;
 import algorithm.ba.core.BASolverConcurrent;
 import algorithm.ga.core.GASolver;
 import controller.Controller;
 import controller.SharedAppData;
+import debug.Debugger;
+import debug.DebuggerToFile;
 import logger.Logger;
-import model.Result.PartialResult;
 
-/**
- * 
- * Processing request implemented as runnable.
- * 
- * @author acco
- * 
- *         Jul 5, 2016 8:05:07 PM
- *
- */
-public class ComputeTask implements Runnable {
+public class DebugTask implements Runnable {
 
 	private List<File> filePaths;
 	private Controller controller;
-	private Map<String, Result> results;
 	private SharedAppData sd;
+	private Debugger debugger;
 
-
-	public ComputeTask(List<File> filePaths, Controller controller, Map<String, Result> results, SharedAppData sd) {
+	public DebugTask(List<File> filePaths, Controller controller, SharedAppData sd) {
 		this.filePaths = filePaths;
 		this.controller = controller;
-		this.results = results;
 		this.sd = sd;
 
+		this.debugger = new DebuggerToFile();
+
+		this.debugger.start();
 	}
 
 	@Override
 	public void run() {
+
 		boolean errors = false;
 
 		/*
@@ -53,7 +47,7 @@ public class ComputeTask implements Runnable {
 			/*
 			 * If there is at least one file try to process it.
 			 */
-			Logger.get().info("Processing ... ");
+			Logger.get().info("Logging to file ... ");
 			this.controller.setStatus(State.PROCESSING);
 
 			for (File file : filePaths) {
@@ -90,28 +84,7 @@ public class ComputeTask implements Runnable {
 						}
 
 						Logger.get().info("Problem: " + instance.getName());
-
-						Result result;
-						/*
-						 * Results are stored into a map. The key is the
-						 * instance name and the value the result. If the user
-						 * asks to process more than once the same problem the
-						 * results will be merged. See the Result class for more
-						 * details.
-						 */
-						if (this.results.containsKey(instance.getName())) {
-							/*
-							 * The map contains the problem. It has been solved
-							 * previously.
-							 */
-							result = this.results.get(instance.getName());
-						} else {
-							/*
-							 * New problem -> new Result
-							 */
-							result = new Result(instance);
-
-						}
+						debugger.writeLine("Problem: " + instance.getName());
 
 						/*
 						 * Run the algorithms r times
@@ -121,19 +94,16 @@ public class ComputeTask implements Runnable {
 							Logger.get().info("Run " + (r + 1) + "/" + AppSettings.get().runs);
 
 							GASolver ga = new GASolver(instance, sd);
-							Optional<PartialResult> gaResult = ga.solve();
+							ga.attach(debugger);
+							ga.solve();
 
 							ANTSSolver ants = new ANTSSolver(instance, sd);
-							Optional<PartialResult> antsResult = ants.solve();
+							ants.attach(debugger);
+							ants.solve();
 
 							BASolverConcurrent bio = new BASolverConcurrent(instance, sd);
-							Optional<PartialResult> bioResult = bio.solve();
-
-							if (gaResult.isPresent() && antsResult.isPresent() && bioResult.isPresent()) {
-								result.merge(gaResult.get(), antsResult.get(), bioResult.get());
-								results.put(instance.getName(), result);
-								controller.refreshResults();
-							}
+							bio.attach(debugger);
+							bio.solve();
 
 						}
 
@@ -158,9 +128,16 @@ public class ComputeTask implements Runnable {
 				}
 			}
 
+			Logger.get().info("Check the file " + this.debugger.getOutput() + "for detailed info.");
+
+			this.debugger.stop();
 			this.controller.reset();
+			try {
+				Desktop.getDesktop().open(this.debugger.getOutput());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
-
 }

@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import controller.SharedAppData;
@@ -14,18 +12,20 @@ import logger.Logger;
 import model.AppSettings;
 import model.Instance;
 import model.Result.PartialResult;
+import solver.AbstractSolver;
 
 /**
  * 
- * The ANTS solver sets up some parameters according to the preferred user configuration then
- * splits the problem into logical tasks processed by a fixed pool of threads. 
+ * The ANTS solver sets up some parameters according to the preferred user
+ * configuration then splits the problem into logical tasks processed by a fixed
+ * pool of threads.
  * 
  * @author acco
  * 
- * Jul 5, 2016 9:33:17 PM
+ *         Jul 5, 2016 9:33:17 PM
  *
  */
-public class ANTSSolver {
+public class ANTSSolver extends AbstractSolver {
 
 	private int maxIterations;
 	private int population;
@@ -33,17 +33,13 @@ public class ANTSSolver {
 	private double[][] tau;
 	private double rho;
 	private Instance instance;
-	private ExecutorService executor;
 	private Ant fittest;
 	private SharedAppData sd;
 
 	public ANTSSolver(Instance instance, SharedAppData sd) {
 		this.instance = instance;
 		this.sd = sd;
-
 		AppSettings s = AppSettings.get();
-
-		this.executor = Executors.newFixedThreadPool(s.threads);
 
 		/*
 		 * Read & set parameters.
@@ -81,19 +77,15 @@ public class ANTSSolver {
 
 		Logger.get().antsInfo("ANTS ALGORITHM .............");
 
+		debugWriteLine("Computing ants algorithm");
+
 		double startTime = System.currentTimeMillis();
 
 		int iteration;
-		
+
 		for (iteration = 0; iteration < maxIterations && !this.sd.isStopped(); iteration++) {
 
-			/*
-			 * for(int x=0;x<this.instance.getJobsNum();x++){ for(int
-			 * y=0;y<this.instance.getAgentsNum();y++){
-			 * System.out.print(this.tau[x][y]+" "); } System.out.println(""); }
-			 * 
-			 * System.out.println("");
-			 */
+			debugWriteLine("Iteration: " + iteration);
 
 			LinkedList<Future<Boolean>> tasks = new LinkedList<>();
 			/*
@@ -114,9 +106,6 @@ public class ANTSSolver {
 			}
 
 			/*
-			 * Traces update.
-			 */
-			/*
 			 * Trace evaporation.
 			 */
 			for (int i = 0; i < instance.getJobsNum(); i++) {
@@ -124,18 +113,31 @@ public class ANTSSolver {
 					tau[i][j] = rho * tau[i][j];
 				}
 			}
-
+			/*
+			 * Traces update.
+			 */
 			for (Ant ant : colony) {
 				ant.updateTrace();
 				if (ant.fitnessCombination() > fittest.fitnessCombination()) {
 					fittest = new Ant(ant);
 				}
 			}
+
+			if (super.areThereDebuggers()) {
+				debugWriteLine("Tau:");
+				for (int i = 0; i < instance.getJobsNum(); i++) {
+					for (int j = 0; j < instance.getAgentsNum(); j++) {
+						debugWrite(String.format("%.3f ", tau[i][j]));
+					}
+					debugWriteLine("");
+				}
+			}
+
+			debugWriteLine("");
+
 		}
 
 		double endTime = System.currentTimeMillis();
-
-		
 
 		Optional<PartialResult> result = Optional.empty();
 

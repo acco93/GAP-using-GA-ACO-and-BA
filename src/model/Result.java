@@ -102,7 +102,7 @@ public class Result {
 		return antsBestValue;
 	}
 
-	public int getBioBestValue() {
+	public int getBaBestValue() {
 		return bioBestValue;
 	}
 
@@ -120,7 +120,7 @@ public class Result {
 		return (double) antsValuesSum / runs;
 	}
 
-	public double getBioAvgValue() {
+	public double getBaAvgValue() {
 		if (runs == 0) {
 			return 0;
 		}
@@ -141,7 +141,7 @@ public class Result {
 		return antsTimeSum / runs;
 	}
 
-	public double getBioAvgTime() {
+	public double getBaAvgTime() {
 		if (runs == 0) {
 			return 0;
 		}

@@ -41,6 +41,14 @@ public class Controller {
 		model.compute();
 	}
 
+	public void record() {
+		this.view.disableInput();
+		List<File> filePaths = this.view.getFilePaths();
+		model.setFilePaths(filePaths);
+		model.record();
+		
+	}
+	
 	public void stop() {
 		sd.setStopped();
 	}
@@ -68,6 +76,8 @@ public class Controller {
 		this.model.clearResults();
 		
 	}
+
+	
 
 
 	

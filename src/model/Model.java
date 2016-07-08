@@ -45,6 +45,12 @@ public class Model {
 		
 	}
 
+	public void record() {
+		DebugTask cp = new DebugTask(filePaths,controller, sd);
+		new Thread(cp).start();
+		
+	}
+	
 	public Map<String, Result> getResults() {
 		return this.results;
 	}
@@ -53,6 +59,8 @@ public class Model {
 		this.results = new HashMap<>();
 		
 	}
+
+	
 
 
 }

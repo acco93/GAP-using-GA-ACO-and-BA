@@ -30,7 +30,7 @@ import model.AppSettings;
  * 
  * @author acco
  * 
- * Jul 5, 2016 8:10:30 AM
+ *         Jul 5, 2016 8:10:30 AM
  *
  */
 public class ParametersPanel extends JPanel {
@@ -81,6 +81,26 @@ public class ParametersPanel extends JPanel {
 
 	private JRadioButton rank;
 
+	private JSpinner baIterations;
+
+	private JSpinner baPopulation;
+
+	private JRadioButton baSinglePoint;
+
+	private CrossoverType baCrossoverMethod;
+
+	private JRadioButton baDoublePoint;
+
+	private JRadioButton baUniform;
+
+	private JSpinner baMutationProbability;
+
+	private JSpinner baInclusionFrequency;
+
+	private JSpinner baSimilarityConstant;
+
+	private JButton debugButton;
+
 	public ParametersPanel() {
 
 		this.setLayout(new BorderLayout());
@@ -113,9 +133,8 @@ public class ParametersPanel extends JPanel {
 		/*
 		 * GA panel.
 		 */
-		
-		mainPanel.add(ViewFactory.titleLabel("GENETIC ALGORITHM"));
 
+		mainPanel.add(ViewFactory.titleLabel("GENETIC ALGORITHM"));
 
 		/*
 		 * Row 1: iterations
@@ -132,7 +151,7 @@ public class ParametersPanel extends JPanel {
 		gaPopulation = new JSpinner(new SpinnerNumberModel(200, 10, 1000, 2));
 		String populationHint = "# of chromosomes";
 		mainPanel.add(ViewFactory.configPanel(populationTitle, gaPopulation, populationHint));
-		
+
 		/*
 		 * Row 2: crossover probability
 		 */
@@ -151,7 +170,6 @@ public class ParametersPanel extends JPanel {
 		String elitismHint = "Copy the fittest solution of the previous iteration to the new population replacing the current worst one";
 		mainPanel.add(ViewFactory.configPanel(elitismTitle, gaElitism, elitismHint));
 
-		
 		/*
 		 * Selection method
 		 */
@@ -175,24 +193,24 @@ public class ParametersPanel extends JPanel {
 		rank.addActionListener((e) -> {
 			gaSelectionMethod = SelectionType.RANK;
 		});
-		
+
 		selectionMethods.add(montecarlo);
 		selectionMethods.add(tournament);
 		selectionMethods.add(rank);
-		
+
 		JPanel selectionPanel = new JPanel();
-		selectionPanel.setLayout(new BoxLayout(selectionPanel,BoxLayout.Y_AXIS));
+		selectionPanel.setLayout(new BoxLayout(selectionPanel, BoxLayout.Y_AXIS));
 		selectionPanel.setOpaque(false);
 		selectionPanel.add(montecarlo);
 		selectionPanel.add(new InfoLabel("Select a chromosome proportionally to its fitness"));
 		selectionPanel.add(tournament);
 		selectionPanel.add(new InfoLabel("Pick 2 random chromosome and select the fittest with a high probability"));
 		selectionPanel.add(rank);
-		selectionPanel.add(new InfoLabel("Select an individual considering its rank rather than the raw fitness. It tries to avoid premature convergence."));
+		selectionPanel.add(new InfoLabel(
+				"Select an individual considering its rank rather than the raw fitness. It tries to avoid premature convergence."));
 
 		String selectionTitle = "Selection method:";
 		mainPanel.add(ViewFactory.configPanel(selectionTitle, selectionPanel, null));
-
 
 		/*
 		 * Row 4: crossover methods
@@ -221,7 +239,7 @@ public class ParametersPanel extends JPanel {
 
 		JPanel crossoverPanel = new JPanel();
 		crossoverPanel.setLayout(new BoxLayout(crossoverPanel, BoxLayout.Y_AXIS));
-		
+
 		crossoverPanel.setOpaque(false);
 		crossoverPanel.add(singlePoint);
 		crossoverPanel.add(new InfoLabel("Exchange parents genes after a randomly choosen position"));
@@ -229,44 +247,40 @@ public class ParametersPanel extends JPanel {
 		crossoverPanel.add(new InfoLabel("Exchange parents genes between two randomly choosen positions"));
 		crossoverPanel.add(uniform);
 		crossoverPanel.add(new InfoLabel("Pick random genes from the parents with equal probability"));
-		
+
 		String crossoverTitle = "Crossover method:";
 		mainPanel.add(ViewFactory.configPanel(crossoverTitle, crossoverPanel, null));
-		
 
 		/*
 		 * Row 5: mutation probability
 		 */
-		
+
 		String mutationProbTitle = "Mutation probability:";
 		gaMutationProbability = new JSpinner(new SpinnerNumberModel(0.1, 0.0, 1, 0.01));
 		gaMutationProbability.setPreferredSize(new Dimension(50, 20));
 		String mutationProbHint = "Mutation probabiliy (min: 0.0; max:1)";
 		mainPanel.add(ViewFactory.configPanel(mutationProbTitle, gaMutationProbability, mutationProbHint));
 
-
 		/*
 		 * ANTS
 		 */
 
 		mainPanel.add(ViewFactory.titleLabel("ANTS ALGORITHM"));
-	
 
 		/*
 		 * Iterations
 		 */
-		
+
 		antsIterations = new JSpinner(new SpinnerNumberModel(1000, 100, 1000000, 100));
 		mainPanel.add(ViewFactory.configPanel(iterationsTitle, antsIterations, iterationsHint));
 
 		/*
 		 * Population
 		 */
-		
+
 		antsPopulation = new JSpinner(new SpinnerNumberModel(200, 10, 1000, 2));
-		String antPopulationHint = "# of chromosomes";
+		String antPopulationHint = "# of ants";
 		mainPanel.add(ViewFactory.configPanel(populationTitle, antsPopulation, antPopulationHint));
-		
 
 		/*
 		 * Alpha
@@ -275,8 +289,8 @@ public class ParametersPanel extends JPanel {
 		String alphaTitle = "\u03B1";
 		antsAlpha = new JSpinner(new SpinnerNumberModel(0.1, 0.0, 1, 0.01));
 		antsAlpha.setPreferredSize(new Dimension(50, 20));
-		antsAlpha.addChangeListener((e)->{
-			antsBeta.setValue(1.0-(double)antsAlpha.getValue());
+		antsAlpha.addChangeListener((e) -> {
+			antsBeta.setValue(1.0 - (double) antsAlpha.getValue());
 		});
 		String alphaHint = "Attractiveness Importance";
 		mainPanel.add(ViewFactory.configPanel(alphaTitle, antsAlpha, alphaHint));
@@ -301,47 +315,145 @@ public class ParametersPanel extends JPanel {
 		antsRho.setPreferredSize(new Dimension(50, 20));
 		String rhoHint = "Evaporation factor (0: remove all; 1:retain all)";
 		mainPanel.add(ViewFactory.configPanel(rhoTitle, antsRho, rhoHint));
-		
+
+		/*
+		 * BIONOMIC ALGORITHM
+		 */
+
+		mainPanel.add(ViewFactory.titleLabel("BIONOMIC ALGORITHM"));
+
+		/*
+		 * Iterations
+		 */
+
+		baIterations = new JSpinner(new SpinnerNumberModel(1000, 100, 1000000, 100));
+		mainPanel.add(ViewFactory.configPanel(iterationsTitle, baIterations, iterationsHint));
+
+		/*
+		 * Population
+		 */
+
+		baPopulation = new JSpinner(new SpinnerNumberModel(200, 10, 1000, 2));
+		String baPopulationHint = "# of solutions";
+		mainPanel.add(ViewFactory.configPanel(populationTitle, baPopulation, baPopulationHint));
+
+		/*
+		 * Inclusion frequency
+		 */
+		baInclusionFrequency = new JSpinner(new SpinnerNumberModel(5, 1, 100, 1));
+		String baInclusionFrequencyTitle = "\u03B8 max:";
+		String baInclusionFrequencyHint = "Max inclusion frequency: \u03B8(worst solution) = 1, \u03B8(best solution) = max, intermediate solutions have integer values linearly distributed between 1 and max.";
+		mainPanel.add(
+				ViewFactory.configPanel(baInclusionFrequencyTitle, baInclusionFrequency, baInclusionFrequencyHint));
+
+		/*
+		 * Similariy constant
+		 */
+		baSimilarityConstant = new JSpinner(new SpinnerNumberModel(0.7, 0.01, 3, 0.01));
+		String baSimilarityConstantTitle = "Similarity constant k:";
+		String baSimilarityConstantHint = "Let \u0394 = dAVG - k * dSTD be the similarity threshold, that is, two solutions are considered similar if difference(A,B) < \u0394 where dAVG = differences mean and dSTD = differences STD";
+		mainPanel.add(
+				ViewFactory.configPanel(baSimilarityConstantTitle, baSimilarityConstant, baSimilarityConstantHint));
+		/*
+		 * Row 4: crossover methods
+		 */
+
+		ButtonGroup baCrossoverMethods = new ButtonGroup();
+		baSinglePoint = new JRadioButton("Single point");
+		baSinglePoint.setSelected(true);
+		baSinglePoint.setOpaque(false);
+		baSinglePoint.addActionListener((e) -> {
+			baCrossoverMethod = CrossoverType.SINGLE_POINT;
+		});
+		baDoublePoint = new JRadioButton("Double point");
+		baDoublePoint.setOpaque(false);
+		baDoublePoint.addActionListener((e) -> {
+			baCrossoverMethod = CrossoverType.DOUBLE_POINT;
+		});
+		baUniform = new JRadioButton("Uniform");
+		baUniform.setOpaque(false);
+		baUniform.addActionListener((e) -> {
+			baCrossoverMethod = CrossoverType.UNIFORM;
+		});
+		baCrossoverMethods.add(baSinglePoint);
+		baCrossoverMethods.add(baDoublePoint);
+		baCrossoverMethods.add(baUniform);
+
+		JPanel baCrossoverPanel = new JPanel();
+		baCrossoverPanel.setLayout(new BoxLayout(baCrossoverPanel, BoxLayout.Y_AXIS));
+
+		baCrossoverPanel.setOpaque(false);
+		baCrossoverPanel.add(baSinglePoint);
+		baCrossoverPanel.add(new InfoLabel("Exchange parents genes after a randomly choosen position"));
+		baCrossoverPanel.add(baDoublePoint);
+		baCrossoverPanel.add(new InfoLabel("Exchange parents genes between two randomly choosen positions"));
+		baCrossoverPanel.add(baUniform);
+		baCrossoverPanel.add(new InfoLabel("Pick random genes from the parents with equal probability"));
+
+		mainPanel.add(ViewFactory.configPanel(crossoverTitle, baCrossoverPanel, null));
+
+		/*
+		 * Row 5: mutation probability
+		 */
+
+		baMutationProbability = new JSpinner(new SpinnerNumberModel(0.1, 0.0, 1, 0.01));
+		baMutationProbability.setPreferredSize(new Dimension(50, 20));
+		mainPanel.add(ViewFactory.configPanel(mutationProbTitle, baMutationProbability, mutationProbHint));
 
 		JScrollPane scroll = new JScrollPane(mainPanel);
+		scroll.getVerticalScrollBar().setUnitIncrement(10);
 		scroll.setOpaque(true);
 		this.add(scroll, BorderLayout.CENTER);
 
 		JPanel bottomPanel = new JPanel(new GridLayout(1, 2));
 
 		resetButton = new JButton("Reset default settings");
-		resetButton.addActionListener((e)->{
+		resetButton.addActionListener((e) -> {
 			AppSettings.resetDefault();
 			this.loadSettings();
+			applyButton.doClick();
 		});
 		bottomPanel.add(resetButton);
 
+		debugButton = new JButton("Set debug values");
+		debugButton.addActionListener((e) -> {
+			AppSettings.get().antsIterations = 100;
+			AppSettings.get().gaIterations = 100;
+			AppSettings.get().baIterations = 100;
+			AppSettings.get().baPopulation = 10;
+			AppSettings.get().gaPopulation = 10;
+			AppSettings.get().antsPopulation = 10;
+			this.loadSettings();
+			applyButton.doClick();
+		});
+
+		bottomPanel.add(debugButton);
+
 		applyButton = new JButton("Apply");
-		applyButton.addActionListener((e)->{
+		applyButton.addActionListener((e) -> {
 			this.updateSettings();
 			applyButton.setText("Successfully updated!!!");
-			applyButton.setBackground(new Color(114,179,94));
-			applyButton.setForeground(new Color(228,244,223));
-			new Timer().schedule(new TimerTask(){
+			applyButton.setBackground(new Color(114, 179, 94));
+			applyButton.setForeground(new Color(228, 244, 223));
+			new Timer().schedule(new TimerTask() {
 
 				@Override
 				public void run() {
-					SwingUtilities.invokeLater(()->{
+					SwingUtilities.invokeLater(() -> {
 						applyButton.setText("Apply");
 						applyButton.setBackground(null);
 						applyButton.setForeground(null);
 					});
-					
-					
-				}}, 3000);
+
+				}
+			}, 3000);
 		});
 		bottomPanel.add(applyButton);
 
 		this.add(bottomPanel, BorderLayout.SOUTH);
-		
+
 		this.loadSettings();
 	}
-
 
 	public class InfoLabel extends JLabel {
 
@@ -350,8 +462,7 @@ public class ParametersPanel extends JPanel {
 		public InfoLabel(String string) {
 			this.setText(string);
 			this.setFont(new Font(this.getFont().getName(), Font.PLAIN, 11));
-			
-			
+
 		}
 
 	}
@@ -360,13 +471,19 @@ public class ParametersPanel extends JPanel {
 
 		AppSettings s = AppSettings.get();
 
+		/*
+		 * GENERAL
+		 */
 		this.threads.setValue(s.threads);
 		this.runs.setValue(s.runs);
 
+		/*
+		 * GA
+		 */
 		this.gaIterations.setValue(s.gaIterations);
 		this.gaPopulation.setValue(s.gaPopulation);
 		this.gaCrossoverProbability.setValue(s.gaCrossoverProbability);
-		
+
 		this.gaElitism.setSelected(s.gaElitism);
 		this.gaSelectionMethod = s.gaSelectionMethod;
 		switch (gaSelectionMethod) {
@@ -382,7 +499,7 @@ public class ParametersPanel extends JPanel {
 			break;
 		}
 		this.gaCrossoverMethod = s.gaCrossoverMethod;
-		switch(gaCrossoverMethod){
+		switch (gaCrossoverMethod) {
 		case DOUBLE_POINT:
 			doublePoint.doClick();
 			break;
@@ -393,49 +510,95 @@ public class ParametersPanel extends JPanel {
 			uniform.doClick();
 			break;
 		default:
-			break;}
-		
+			break;
+		}
+
 		this.gaMutationProbability.setValue(s.gaMutationProbability);
-		
+
 		/*
 		 * ANTS
 		 */
-		
+
 		this.antsIterations.setValue(s.antsIterations);
 		this.antsPopulation.setValue(s.antsPopulation);
 		this.antsAlpha.setValue(s.antsAlpha);
 		this.antsBeta.setValue(s.antsBeta);
 		this.antsRho.setValue(s.antsRho);
+
+		/*
+		 * BA
+		 */
+		this.baIterations.setValue(s.baIterations);
+		this.baPopulation.setValue(s.baPopulation);
+		this.baInclusionFrequency.setValue(s.baMaxInclusionFrequency);
+		this.baSimilarityConstant.setValue(s.baSimilarityConstant);
+
+		this.baCrossoverMethod = s.baCrossoverMethod;
+		switch (baCrossoverMethod) {
+		case DOUBLE_POINT:
+			baDoublePoint.doClick();
+			break;
+		case SINGLE_POINT:
+			baSinglePoint.doClick();
+			break;
+		case UNIFORM:
+			baUniform.doClick();
+			break;
+		default:
+			break;
+		}
+
+		this.baMutationProbability.setValue(s.baMutationProbability);
 	}
-	
+
 	private void updateSettings() {
-		
+
 		AppSettings s = AppSettings.get();
 
+		/*
+		 * GENERAL
+		 */
 		s.threads = (int) this.threads.getValue();
 		s.runs = (int) this.runs.getValue();
+
+		/*
+		 * GA
+		 */
 
 		s.gaIterations = (int) this.gaIterations.getValue();
 		s.gaPopulation = (int) this.gaPopulation.getValue();
 		s.gaCrossoverProbability = (double) this.gaCrossoverProbability.getValue();
-		
+
 		s.gaElitism = this.gaElitism.isSelected();
 		this.gaSelectionMethod = s.gaSelectionMethod;
-		
+
 		this.gaCrossoverMethod = s.gaCrossoverMethod;
-			
+
 		s.gaMutationProbability = (double) this.gaMutationProbability.getValue();
-		
+
 		/*
 		 * ANTS
 		 */
-		
+
 		s.antsIterations = (int) this.antsIterations.getValue();
 		s.antsPopulation = (int) this.antsPopulation.getValue();
 		s.antsAlpha = (double) this.antsAlpha.getValue();
 		s.antsBeta = (double) this.antsBeta.getValue();
 		s.antsRho = (double) this.antsRho.getValue();
-		
+
+		/*
+		 * BA
+		 */
+
+		s.baIterations = (int) this.baIterations.getValue();
+		s.baPopulation = (int) this.baPopulation.getValue();
+		s.baMaxInclusionFrequency = (int) this.baInclusionFrequency.getValue();
+		s.baSimilarityConstant = (double) this.baSimilarityConstant.getValue();
+
+		this.baCrossoverMethod = s.baCrossoverMethod;
+
+		s.baMutationProbability = (double) this.baMutationProbability.getValue();
+
 	}
 
 	public void disableInput() {
@@ -446,7 +609,7 @@ public class ParametersPanel extends JPanel {
 	public void enableInput() {
 		this.resetButton.setEnabled(true);
 		this.applyButton.setEnabled(true);
-		
+
 	}
-	
+
 }

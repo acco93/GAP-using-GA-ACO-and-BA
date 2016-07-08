@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import algorithm.ga.crossover.CrossoverMethod;
@@ -22,6 +20,7 @@ import logger.Logger;
 import model.AppSettings;
 import model.Instance;
 import model.Result.PartialResult;
+import solver.AbstractSolver;
 import util.Pair;
 
 /**
@@ -35,15 +34,13 @@ import util.Pair;
  *         Jul 5, 2016 9:29:27 PM
  *
  */
-public class GASolver {
+public class GASolver extends AbstractSolver {
 
 	private int populationSize;
 	private double crossoverProbability;
 	private double mutationProbability;
 
 	private int maxIterations;
-
-	private ExecutorService executor;
 
 	private CrossoverMethod crossoverMethod;
 
@@ -58,14 +55,11 @@ public class GASolver {
 	public GASolver(Instance instance, SharedAppData sd) {
 
 		this.sd = sd;
-
 		/*
 		 * Read & set parameters.
 		 */
 
 		AppSettings s = AppSettings.get();
-
-		this.executor = Executors.newFixedThreadPool(s.threads);
 
 		switch (s.gaSelectionMethod) {
 		case MONTECARLO:
@@ -111,11 +105,16 @@ public class GASolver {
 
 		Logger.get().gaInfo("GENETIC ALGORITHM ............. ");
 
+		debugWriteLine("Computing genetic algorithm");
+
 		double startTime = System.currentTimeMillis();
 
 		while (i < this.maxIterations && !sd.isStopped()) {
 
-			// System.out.println(genome.getFitnessStandardDeviation());
+			debugWriteLine("Iteration: " + i);
+			debugWriteLine("Fitness mean: " + genome.getFitnessMean());
+			debugWriteLine("Fitness variance: " + genome.getFitnessVariance());
+			debugWriteLine("Fitness std: " + genome.getFitnessStandardDeviation());
 
 			List<Chromosome> children = new ArrayList<Chromosome>();
 			LinkedList<Future<Pair<Chromosome, Chromosome>>> tasks = new LinkedList<>();
@@ -167,14 +166,16 @@ public class GASolver {
 				genome.elitism();
 			}
 
+			debugWriteLine("");
+
 			i++;
 		}
 
 		double endTime = System.currentTimeMillis();
 
 		Optional<PartialResult> result = Optional.empty();
-		
-		if(i==this.maxIterations){
+
+		if (i == this.maxIterations) {
 			result = Optional.of(new PartialResult(genome.getFittest().fitnessCombination(), endTime - startTime));
 			Logger.get().gaInfo("Fittest: " + genome.getFittest());
 		} else {

@@ -37,6 +37,9 @@ public class AppSettings {
 	public int baPopulation;
 	public double baMutationProbability;
 	public CrossoverType baCrossoverMethod;
+	public int baMaxInclusionFrequency;
+	public double baSimilarityConstant;
+	public boolean debug;
 	
 
 	private AppSettings() {
@@ -45,6 +48,7 @@ public class AppSettings {
 		 */
 		this.threads = Runtime.getRuntime().availableProcessors() + 1;
 		this.runs = 1;
+		this.debug = true;
 		/*
 		 * GA
 		 */
@@ -69,6 +73,8 @@ public class AppSettings {
 		 */
 		this.baIterations = 5000;
 		this.baPopulation = 200;
+		this.baMaxInclusionFrequency = 5;
+		this.baSimilarityConstant = 0.7;
 		this.baMutationProbability = 0.1;
 		this.baCrossoverMethod = CrossoverType.DOUBLE_POINT;
 	}

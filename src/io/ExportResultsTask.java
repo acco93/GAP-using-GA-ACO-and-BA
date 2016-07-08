@@ -52,7 +52,7 @@ public class ExportResultsTask implements Runnable {
 				 */
 				output = new BufferedWriter(new FileWriter(file));
 				output.write(
-						"Instance,Runs,GA best value,GA avg value,GA avg time (ms),ANTS Best value, ANTS avg value, ANTS avg time (ms)\n");
+						"Instance, Runs, GA z*, GA avg z, GA avg t (ms), ANTS z*, ANTS avg z, ANTS avg t (ms), BA z*, BA avg z, BA avg t (ms)\n");
 				for (Result result : list) {
 					output.write(result.getInstance().getLogicalName() + ",");
 					output.write(result.getRuns() + ",");
@@ -61,7 +61,11 @@ public class ExportResultsTask implements Runnable {
 					output.write(result.getGaAvgTime() + ",");
 					output.write(result.getAntsBestValue() + ",");
 					output.write(result.getAntsAvgValue() + ",");
-					output.write(result.getAntsAvgTime() + "\n");
+					output.write(result.getAntsAvgTime() + ",");
+					output.write(result.getBaBestValue() + ",");
+					output.write(result.getBaAvgValue() + ",");
+					output.write(result.getBaAvgTime() + "\n");
+
 				}
 				output.close();
 			} catch (Exception e1) {
