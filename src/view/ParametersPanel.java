@@ -20,6 +20,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
+import algorithm.ba.crossover.MultiCrossoverType;
 import algorithm.ga.crossover.CrossoverType;
 import algorithm.ga.selection.SelectionType;
 import model.AppSettings;
@@ -87,7 +88,7 @@ public class ParametersPanel extends JPanel {
 
 	private JRadioButton baSinglePoint;
 
-	private CrossoverType baCrossoverMethod;
+	private MultiCrossoverType baCrossoverMethod;
 
 	private JRadioButton baDoublePoint;
 
@@ -100,6 +101,8 @@ public class ParametersPanel extends JPanel {
 	private JSpinner baSimilarityConstant;
 
 	private JButton debugButton;
+
+	private JRadioButton baStandard;
 
 	public ParametersPanel() {
 
@@ -363,18 +366,25 @@ public class ParametersPanel extends JPanel {
 		baSinglePoint.setSelected(true);
 		baSinglePoint.setOpaque(false);
 		baSinglePoint.addActionListener((e) -> {
-			baCrossoverMethod = CrossoverType.SINGLE_POINT;
+			baCrossoverMethod = MultiCrossoverType.MULTI_SINGLE_POINT;
 		});
 		baDoublePoint = new JRadioButton("Double point");
 		baDoublePoint.setOpaque(false);
 		baDoublePoint.addActionListener((e) -> {
-			baCrossoverMethod = CrossoverType.DOUBLE_POINT;
+			baCrossoverMethod = MultiCrossoverType.MULTI_DOUBLE_POINT;
 		});
 		baUniform = new JRadioButton("Uniform");
 		baUniform.setOpaque(false);
 		baUniform.addActionListener((e) -> {
-			baCrossoverMethod = CrossoverType.UNIFORM;
+			baCrossoverMethod = MultiCrossoverType.MULTI_UNIFORM;
 		});
+		baStandard = new JRadioButton("Standard");
+		baStandard.setOpaque(false);
+		baStandard.addActionListener((e) -> {
+			baCrossoverMethod = MultiCrossoverType.STANDARD;
+		});
+
+		baCrossoverMethods.add(baStandard);
 		baCrossoverMethods.add(baSinglePoint);
 		baCrossoverMethods.add(baDoublePoint);
 		baCrossoverMethods.add(baUniform);
@@ -383,12 +393,15 @@ public class ParametersPanel extends JPanel {
 		baCrossoverPanel.setLayout(new BoxLayout(baCrossoverPanel, BoxLayout.Y_AXIS));
 
 		baCrossoverPanel.setOpaque(false);
+		baCrossoverPanel.add(baStandard);
+		baCrossoverPanel
+				.add(new InfoLabel("Given k parents and n jobs define a child using n/k agents from each parent"));
 		baCrossoverPanel.add(baSinglePoint);
-		baCrossoverPanel.add(new InfoLabel("Exchange parents genes after a randomly choosen position"));
+		baCrossoverPanel.add(new InfoLabel("Iteratively apply a single point crossover among parents"));
 		baCrossoverPanel.add(baDoublePoint);
-		baCrossoverPanel.add(new InfoLabel("Exchange parents genes between two randomly choosen positions"));
+		baCrossoverPanel.add(new InfoLabel("Iteratively apply a double point crossover among parents"));
 		baCrossoverPanel.add(baUniform);
-		baCrossoverPanel.add(new InfoLabel("Pick random genes from the parents with equal probability"));
+		baCrossoverPanel.add(new InfoLabel("Iteratively apply a uniform crossover among parents"));
 
 		mainPanel.add(ViewFactory.configPanel(crossoverTitle, baCrossoverPanel, null));
 
@@ -535,15 +548,17 @@ public class ParametersPanel extends JPanel {
 
 		this.baCrossoverMethod = s.baCrossoverMethod;
 		switch (baCrossoverMethod) {
-		case DOUBLE_POINT:
+		case MULTI_DOUBLE_POINT:
 			baDoublePoint.doClick();
 			break;
-		case SINGLE_POINT:
+		case MULTI_SINGLE_POINT:
 			baSinglePoint.doClick();
 			break;
-		case UNIFORM:
+		case MULTI_UNIFORM:
 			baUniform.doClick();
 			break;
+		case STANDARD:
+			baStandard.doClick();
 		default:
 			break;
 		}

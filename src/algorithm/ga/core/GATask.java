@@ -61,8 +61,8 @@ public class GATask implements Callable<Pair<Chromosome, Chromosome>> {
 		 * Mutation.
 		 */
 		if (new Random().nextDouble() < this.mutationProbability) {
-			offsprings.getFirst().mutation();
-			offsprings.getSecond().mutation();
+			offsprings.getFirst().mutate();
+			offsprings.getSecond().mutate();
 		}
 		/*
 		 * Local search.

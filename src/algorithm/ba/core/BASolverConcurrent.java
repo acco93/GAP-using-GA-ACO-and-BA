@@ -7,9 +7,11 @@ import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import algorithm.ba.crossover.GenBasedMultiCrossover;
+import algorithm.ba.crossover.MultiCrossoverMethod;
+import algorithm.ba.crossover.StandardMultiCrossover;
 import algorithm.ga.core.Chromosome;
 import algorithm.ga.core.Genome;
-import algorithm.ga.crossover.CrossoverMethod;
 import algorithm.ga.crossover.DoublePointCrossover;
 import algorithm.ga.crossover.SinglePointCrossover;
 import algorithm.ga.crossover.UniformCrossover;
@@ -34,11 +36,11 @@ public class BASolverConcurrent extends AbstractSolver {
 	private SharedAppData sd;
 	private int maxIterations;
 	private Genome genome;
-	private CrossoverMethod crossoverMethod;
 	private int tasksNum;
 	private double mutationProbability;
 	private int maxInclusionFrequency;
 	private double similarityConstant;
+	private MultiCrossoverMethod crossoverMethod;
 
 	public BASolverConcurrent(Instance instance, SharedAppData sd) {
 		this.sd = sd;
@@ -48,14 +50,17 @@ public class BASolverConcurrent extends AbstractSolver {
 		this.maxIterations = s.baIterations;
 
 		switch (s.baCrossoverMethod) {
-		case DOUBLE_POINT:
-			this.crossoverMethod = new DoublePointCrossover();
+		case MULTI_DOUBLE_POINT:
+			this.crossoverMethod = new GenBasedMultiCrossover(new DoublePointCrossover());
 			break;
-		case SINGLE_POINT:
-			this.crossoverMethod = new SinglePointCrossover();
+		case MULTI_SINGLE_POINT:
+			this.crossoverMethod = new GenBasedMultiCrossover(new SinglePointCrossover());
 			break;
-		case UNIFORM:
-			this.crossoverMethod = new UniformCrossover();
+		case MULTI_UNIFORM:
+			this.crossoverMethod = new GenBasedMultiCrossover(new UniformCrossover());
+			break;
+		case STANDARD:
+			this.crossoverMethod = new StandardMultiCrossover();
 			break;
 		default:
 			throw new IllegalStateException();
@@ -233,8 +238,11 @@ public class BASolverConcurrent extends AbstractSolver {
 
 				List<Future<Chromosome>> crossoverTasks = new ArrayList<Future<Chromosome>>();
 				for (int i = 0; i < parents.size(); i++) {
+					// Future<Chromosome> task = this.executor
+					// .submit(new CrossoverTask(i, parents, crossoverMethod,
+					// this.mutationProbability));
 					Future<Chromosome> task = this.executor
-							.submit(new CrossoverTask(i, parents, crossoverMethod, this.mutationProbability));
+							.submit(new CrossoverTask(this.crossoverMethod, i, parents, this.mutationProbability));
 					crossoverTasks.add(task);
 				}
 

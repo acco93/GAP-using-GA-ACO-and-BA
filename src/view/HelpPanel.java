@@ -65,7 +65,6 @@ public class HelpPanel extends JPanel {
 		this.newLine();
 		
 		this.append("..:: HOW IT WORKS ::..", titleStyle);
-		this.newLine();
 		this.append("a) Tune the parameters as you wish in the Configuration tab", null);
 		this.append("b) Switch to the Workspace tab", null);
 		this.append("a) Add one or more files (see the file structure section below) in the file list", null);
@@ -74,7 +73,6 @@ public class HelpPanel extends JPanel {
 		this.newLine();
 		
 		this.append("..:: FILE STRUCTURE ::..", titleStyle);
-		this.newLine();
 		this.append("The application works with files in the format described in:", null);
 		this.append("http://people.brunel.ac.uk/~mastjjb/jeb/orlib/gapinfo.html", linkStyle);
 		this.newLine();
@@ -84,23 +82,21 @@ public class HelpPanel extends JPanel {
 		this.newLine();
 		
 		this.append("..:: PROBLEM NOTES ::..", titleStyle);
-		this.newLine();
 		this.append("GAP is solved as a maximization problem", null);
 		this.newLine();
 		
 		this.append("..:: GA NOTES ::..", titleStyle);
-		this.newLine();
 		this.append("A lot of ideas have been taken from:", null);
 		this.append("P.C.Chu and J.E.Beasley (1996) A Genetic Algorithm for the Generalised Assignment Problem", paperStyle);
 		this.newLine();
 		
 		this.append("..:: BA NOTES ::..", titleStyle);
-		this.newLine();
 		this.append("Form more information:", null);
 		this.append("V. Maniezzo, A. Mingozzi and R.Baldacci (1998) A Bionomic Approach to the Capacitated p-Median Problem", paperStyle);
 		this.newLine();
 		
 		this.append("..:: ANTS NOTES ::..", titleStyle);
+		this.append("...", null);
 		this.newLine();
 
 		

@@ -209,7 +209,7 @@ public class Chromosome {
 				+ ", fitness combination=" + this.fitnessCombination() + "]";
 	}
 
-	public void mutation() {
+	public void mutate() {
 		/*
 		 * Exchange two randomly chosen agents.
 		 */

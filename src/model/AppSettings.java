@@ -1,5 +1,6 @@
 package model;
 
+import algorithm.ba.crossover.MultiCrossoverType;
 import algorithm.ga.crossover.CrossoverType;
 import algorithm.ga.selection.SelectionType;
 
@@ -36,11 +37,10 @@ public class AppSettings {
 	public int baIterations;
 	public int baPopulation;
 	public double baMutationProbability;
-	public CrossoverType baCrossoverMethod;
+	public MultiCrossoverType baCrossoverMethod;
 	public int baMaxInclusionFrequency;
 	public double baSimilarityConstant;
 	public boolean debug;
-	
 
 	private AppSettings() {
 		/*
@@ -76,7 +76,7 @@ public class AppSettings {
 		this.baMaxInclusionFrequency = 5;
 		this.baSimilarityConstant = 0.7;
 		this.baMutationProbability = 0.1;
-		this.baCrossoverMethod = CrossoverType.DOUBLE_POINT;
+		this.baCrossoverMethod = MultiCrossoverType.STANDARD;
 	}
 
 	public static void resetDefault() {
