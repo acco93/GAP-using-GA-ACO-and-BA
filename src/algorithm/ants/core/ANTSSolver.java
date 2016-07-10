@@ -36,6 +36,8 @@ public class ANTSSolver extends AbstractSolver {
 	private Ant fittest;
 	private SharedAppData sd;
 	private int tasksNum;
+	private double minTau;
+	private double maxTau;
 
 	public ANTSSolver(Instance instance, SharedAppData sd) {
 		this.instance = instance;
@@ -59,6 +61,9 @@ public class ANTSSolver extends AbstractSolver {
 		int maxCost = Arrays.stream(instance.getCosts()).flatMapToInt(Arrays::stream).max().getAsInt();
 
 		int tau0 = 2 * maxCost;
+
+		this.minTau = 1;
+		this.maxTau = tau0;
 
 		for (int i = 0; i < instance.getJobsNum(); i++) {
 			for (int j = 0; j < instance.getAgentsNum(); j++) {
@@ -130,6 +135,18 @@ public class ANTSSolver extends AbstractSolver {
 				ant.updateTrace();
 				if (ant.fitnessCombination() > fittest.fitnessCombination()) {
 					fittest = new Ant(ant);
+				}
+			}
+
+			if (AppSettings.get().antsMinMax) {
+				for (int i = 0; i < instance.getJobsNum(); i++) {
+					for (int j = 0; j < instance.getAgentsNum(); j++) {
+						if (tau[i][j] < this.minTau) {
+							tau[i][j] = this.minTau;
+						} else if (tau[i][j] > maxTau) {
+							tau[i][j] = this.maxTau;
+						}
+					}
 				}
 			}
 

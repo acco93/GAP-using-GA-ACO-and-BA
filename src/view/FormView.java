@@ -59,7 +59,7 @@ public class FormView extends JFrame implements View {
 		HelpPanel hPanel = new HelpPanel();
 		tabbedPane.addTab("Help & instructions", hPanel);
 
-		fsPanel = new FileSelectionPanel();
+		fsPanel = new FileSelectionPanel(controller);
 
 		pPanel = new ParametersPanel();
 		tabbedPane.addTab("Configurations", pPanel);

@@ -11,7 +11,9 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -38,6 +40,7 @@ public class ResultsPanel extends JPanel {
 	private JLabel resultsLabel;
 	private JButton clearButton;
 	private Controller controller;
+	private JMenuItem removeSelected;
 
 	public ResultsPanel(Controller controller) {
 		this.controller = controller;
@@ -65,7 +68,7 @@ public class ResultsPanel extends JPanel {
 		bottomPanel.setOpaque(false);
 
 		clearButton = new JButton(R.CLEAR_ICON);
-		clearButton.setToolTipText("Definitely clear current results");
+		clearButton.setToolTipText("Clear all results");
 		clearButton.setContentAreaFilled(false);
 		clearButton.addActionListener((e) -> {
 			controller.clearResults();
@@ -74,6 +77,35 @@ public class ResultsPanel extends JPanel {
 		bottomPanel.add(clearButton);
 
 		this.add(bottomPanel, BorderLayout.SOUTH);
+
+		JPopupMenu jPopupMenu = new JPopupMenu() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void show(Component invoker, int x, int y) {
+
+				int[] rows = table.getSelectedRows();
+
+				if (rows.length > 0) {
+					// list.setSelectedIndex(row);
+					super.show(invoker, x, y);
+				}
+
+			}
+		};
+
+		table.setComponentPopupMenu(jPopupMenu);
+
+		removeSelected = new JMenuItem("Remove selected", R.REMOVE_ICON);
+		removeSelected.addActionListener((e) -> {
+			int[] indices = table.getSelectedRows();
+			for (int i = 0; i < indices.length; i++) {
+				tableModel.removeRow(indices[i]);
+			}
+			this.refreshResults();
+		});
+		jPopupMenu.add(removeSelected);
 	}
 
 	/**
@@ -96,6 +128,7 @@ public class ResultsPanel extends JPanel {
 	 */
 	public void disableInput() {
 		this.clearButton.setEnabled(false);
+		this.removeSelected.setEnabled(false);
 	}
 
 	/**
@@ -103,6 +136,7 @@ public class ResultsPanel extends JPanel {
 	 */
 	public void enableInput() {
 		this.clearButton.setEnabled(true);
+		this.removeSelected.setEnabled(true);
 	}
 
 	/**
@@ -118,9 +152,8 @@ public class ResultsPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
-		private String[] columnNames = { "Instance", "Runs", "GA z*", "GA avg z ", "GA avg t (ms)",
-				"ANTS z*", "ANTS avg z", "ANTS avg t (ms)", "BA z*", "BA avg z",
-				"BA avg t (ms)" };
+		private String[] columnNames = { "Instance", "Runs", "GA z*", "GA avg z ", "GA avg t (ms)", "ANTS z*",
+				"ANTS avg z", "ANTS avg t (ms)", "BA z*", "BA avg z", "BA avg t (ms)" };
 
 		private List<Result> list;
 
@@ -130,6 +163,11 @@ public class ResultsPanel extends JPanel {
 			this.controller = controller;
 			this.refreshModel();
 
+		}
+
+		public void removeRow(int i) {
+			Result resultToRemove = this.list.get(i);
+			this.controller.getResults().remove(resultToRemove.getInstance().getName());
 		}
 
 		/**

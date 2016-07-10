@@ -104,6 +104,8 @@ public class ParametersPanel extends JPanel {
 
 	private JRadioButton baStandard;
 
+	private JCheckBox minMax;
+
 	public ParametersPanel() {
 
 		this.setLayout(new BorderLayout());
@@ -319,6 +321,11 @@ public class ParametersPanel extends JPanel {
 		String rhoHint = "Evaporation factor (0: remove all; 1:retain all)";
 		mainPanel.add(ViewFactory.configPanel(rhoTitle, antsRho, rhoHint));
 
+		String minMaxTitle = "Min-max";
+		minMax = new JCheckBox();
+		minMax.setOpaque(false);
+		String minMaxHint = "Constraint min <= \u03C4[i,j] <= max \u2200 i,j where min = 1, max = 2*maxCost";
+		mainPanel.add(ViewFactory.configPanel(minMaxTitle, minMax, minMaxHint));
 		/*
 		 * BIONOMIC ALGORITHM
 		 */
@@ -537,6 +544,7 @@ public class ParametersPanel extends JPanel {
 		this.antsAlpha.setValue(s.antsAlpha);
 		this.antsBeta.setValue(s.antsBeta);
 		this.antsRho.setValue(s.antsRho);
+		this.minMax.setSelected(s.antsMinMax);
 
 		/*
 		 * BA
@@ -600,7 +608,8 @@ public class ParametersPanel extends JPanel {
 		s.antsAlpha = (double) this.antsAlpha.getValue();
 		s.antsBeta = (double) this.antsBeta.getValue();
 		s.antsRho = (double) this.antsRho.getValue();
-
+		s.antsMinMax = this.minMax.isSelected();
+		
 		/*
 		 * BA
 		 */

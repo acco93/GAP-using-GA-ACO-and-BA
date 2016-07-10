@@ -3,6 +3,7 @@ package controller;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import model.Model;
 import model.Result;
@@ -16,7 +17,7 @@ import view.View;
  * 
  * @author acco
  * 
- * Jul 5, 2016 8:35:34 PM
+ *         Jul 5, 2016 8:35:34 PM
  *
  */
 public class Controller {
@@ -25,42 +26,50 @@ public class Controller {
 	private Model model;
 	private SharedAppData sd;
 
-	public Controller(){
-		
+	public Controller() {
+
 		sd = new SharedAppData();
-		
+
 		model = new Model(this, sd);
 		view = new FormView(this);
 		view.setState(State.IDLE);
 	}
 
 	public void start() {
-		this.view.disableInput();
 		List<File> filePaths = this.view.getFilePaths();
-		model.setFilePaths(filePaths);
+		this.start(filePaths);
+	}
+
+	public void start(List<File> files) {
+		this.view.disableInput();
+		model.setFilePaths(files);
 		model.compute();
 	}
 
 	public void record() {
-		this.view.disableInput();
 		List<File> filePaths = this.view.getFilePaths();
-		model.setFilePaths(filePaths);
-		model.record();
-		
+		this.record(filePaths);
 	}
-	
+
+	public void record(List<File> files) {
+		this.view.disableInput();
+		model.setFilePaths(files);
+		model.record();
+
+	}
+
 	public void stop() {
 		sd.setStopped();
 	}
-	
-	public void reset(){
+
+	public void reset() {
 		this.view.enableInput();
 		this.sd.reset();
 	}
 
 	public void setStatus(State state) {
 		this.view.setState(state);
-		
+
 	}
 
 	public Map<String, Result> getResults() {
@@ -69,16 +78,12 @@ public class Controller {
 
 	public void refreshResults() {
 		view.refreshResults();
-		
+
 	}
 
 	public void clearResults() {
 		this.model.clearResults();
-		
+
 	}
 
-	
-
-
-	
 }

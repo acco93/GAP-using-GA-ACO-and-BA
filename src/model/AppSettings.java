@@ -41,6 +41,7 @@ public class AppSettings {
 	public int baMaxInclusionFrequency;
 	public double baSimilarityConstant;
 	public boolean debug;
+	public boolean antsMinMax;
 
 	private AppSettings() {
 		/*
@@ -67,6 +68,7 @@ public class AppSettings {
 		this.antsAlpha = 0.6;
 		this.antsBeta = 0.4;
 		this.antsRho = 0.4;
+		this.antsMinMax = true;
 
 		/*
 		 * Bionomic

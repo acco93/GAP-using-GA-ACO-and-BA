@@ -36,7 +36,7 @@ public class ToolBar extends JToolBar {
 		 * Start button.
 		 */
 		startButton = new JButton(R.START_ICON);
-		startButton.setToolTipText("Start processing");
+		startButton.setToolTipText("Start batch processing");
 		startButton.setContentAreaFilled(false);
 
 		startButton.addActionListener((e) -> {
@@ -51,13 +51,21 @@ public class ToolBar extends JToolBar {
 		 */
 		recordButton = new JButton(R.RECORD_ICON);
 		recordButton.setToolTipText(
-				"Start processing & write detailed log to file (please make sure to use few iterations & small population)");
+				"Process & write detailed log information to file (please make sure to use few iterations & small population)");
 		recordButton.setContentAreaFilled(false);
 
 		recordButton.addActionListener((e) -> {
-			stopButton.setEnabled(true);
-			startButton.setEnabled(false);
-			controller.record();
+			int reply = JOptionPane.showConfirmDialog(null,
+					"Would you like to record detailed information about the runs?\nThe resulting file will be rather huge, please make sure you've\nchosen a reasonable amount of iterations. The file will be created\nin your current directory and will be automatically opened once\nthe computation is finished.\n\nWould you like to continue?",
+					"Warning", JOptionPane.YES_NO_OPTION);
+			if (reply == JOptionPane.YES_OPTION) {
+				stopButton.setEnabled(true);
+				startButton.setEnabled(false);
+				controller.record();
+			} else {
+
+			}
+
 		});
 		this.add(recordButton);
 

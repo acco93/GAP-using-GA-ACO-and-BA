@@ -128,7 +128,7 @@ public class DebugTask implements Runnable {
 				}
 			}
 
-			Logger.get().info("Check the file " + this.debugger.getOutput() + "for detailed info.");
+			Logger.get().info("Check the file " + this.debugger.getOutput() + " for detailed info.");
 
 			this.debugger.stop();
 			this.controller.reset();

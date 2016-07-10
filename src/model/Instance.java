@@ -1,4 +1,5 @@
 package model;
+
 import java.util.Arrays;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Arrays;
  * 
  * @author acco
  * 
- * Jul 5, 2016 8:17:07 PM
+ *         Jul 5, 2016 8:17:07 PM
  *
  */
 public class Instance {
@@ -20,9 +21,10 @@ public class Instance {
 	private int[] agentsCapacity;
 	private String logicalName;
 
-	public Instance(String filePath, int index, int agentsNum, int jobsNum, int[][] costs, int[][] resourcesNeeded, int[] agentsCapacity) {
-		this.name = filePath+" c"+agentsNum+""+jobsNum+"-"+index;
-		this.logicalName = " c"+agentsNum+""+jobsNum+"-"+index;
+	public Instance(String filePath, int index, int agentsNum, int jobsNum, int[][] costs, int[][] resourcesNeeded,
+			int[] agentsCapacity) {
+		this.name = filePath + " c" + agentsNum + "" + jobsNum + "-" + index;
+		this.logicalName = " c" + agentsNum + "" + jobsNum + "-" + index;
 		this.agentsNum = agentsNum;
 		this.jobsNum = jobsNum;
 		this.costs = costs;
@@ -30,8 +32,6 @@ public class Instance {
 		this.agentsCapacity = agentsCapacity;
 	}
 
-	
-	
 	public String getName() {
 		return name;
 	}
@@ -44,40 +44,27 @@ public class Instance {
 		return agentsNum;
 	}
 
-
-
 	public int getJobsNum() {
 		return jobsNum;
 	}
-
-
 
 	public int[][] getCosts() {
 		return costs;
 	}
 
-
-
 	public int[][] getResoucesNeeded() {
 		return resoucesNeeded;
 	}
-
-
 
 	public int[] getAgentsCapacity() {
 		return agentsCapacity;
 	}
 
-
-
 	@Override
 	public String toString() {
 		return "Instance [name=" + name + "\nagentsNum=" + agentsNum + "\njobsNum=" + jobsNum + "\ncosts="
-				+ Arrays.deepToString(costs) + "\nresoucesNeeded=" + Arrays.deepToString(resoucesNeeded) + "\nagentsCapacity="
-				+ Arrays.toString(agentsCapacity) + "]";
+				+ Arrays.deepToString(costs) + "\nresoucesNeeded=" + Arrays.deepToString(resoucesNeeded)
+				+ "\nagentsCapacity=" + Arrays.toString(agentsCapacity) + "]";
 	}
 
-
-	
-	
 }
