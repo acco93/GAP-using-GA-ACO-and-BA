@@ -60,7 +60,7 @@ public class ANTSSolver extends AbstractSolver {
 
 		int maxCost = Arrays.stream(instance.getCosts()).flatMapToInt(Arrays::stream).max().getAsInt();
 
-		int tau0 = 2 * maxCost;
+		int tau0 = 5 * maxCost;
 
 		this.minTau = 1;
 		this.maxTau = tau0;

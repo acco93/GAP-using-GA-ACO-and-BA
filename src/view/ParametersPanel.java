@@ -324,7 +324,7 @@ public class ParametersPanel extends JPanel {
 		String minMaxTitle = "Min-max";
 		minMax = new JCheckBox();
 		minMax.setOpaque(false);
-		String minMaxHint = "Constraint min <= \u03C4[i,j] <= max \u2200 i,j where min = 1, max = 2*maxCost";
+		String minMaxHint = "Constraint min <= \u03C4[i,j] <= max \u2200 i,j where min = 1, max = 5*maxCost";
 		mainPanel.add(ViewFactory.configPanel(minMaxTitle, minMax, minMaxHint));
 		/*
 		 * BIONOMIC ALGORITHM

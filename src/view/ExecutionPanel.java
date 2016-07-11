@@ -3,13 +3,8 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -62,23 +57,15 @@ public class ExecutionPanel extends JPanel implements LogViewer {
 		bottomPanel.setOpaque(false);
 		this.add(bottomPanel);
 
-		BufferedImage buttonIcon;
-		try {
-			buttonIcon = ImageIO.read(new File("icons/MinusRedButton.png"));
-
-			JButton clearButton = new JButton(new ImageIcon(buttonIcon));
-			clearButton.setToolTipText("Clear the log");
-			clearButton.setContentAreaFilled(false);
-			clearButton.addActionListener((e) -> {
-				SwingUtilities.invokeLater(() -> {
-					log.setText("");
-				});
+		JButton clearButton = new JButton(R.CLEAR_ICON);
+		clearButton.setToolTipText("Clear the log");
+		clearButton.setContentAreaFilled(false);
+		clearButton.addActionListener((e) -> {
+			SwingUtilities.invokeLater(() -> {
+				log.setText("");
 			});
-			bottomPanel.add(clearButton);
-		} catch (IOException e1) {
-
-			e1.printStackTrace();
-		}
+		});
+		bottomPanel.add(clearButton);
 
 		this.add(bottomPanel, BorderLayout.SOUTH);
 

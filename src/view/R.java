@@ -1,7 +1,6 @@
 package view;
 
 import java.awt.Color;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -41,23 +40,26 @@ public class R {
 	public static Icon REMOVE_ICON;
 	public static Icon ADD_ICON;
 
+	
 	static {
 		try {
-
-			START_ICON = new ImageIcon(ImageIO.read(new File("icons/Play.png")));
-			START_ICON_SMALL = new ImageIcon(ImageIO.read(new File("icons/PlaySmall.png")));
-			STOP_ICON = new ImageIcon(ImageIO.read(new File("icons/Stop.png")));
-			EXPORT_ICON = new ImageIcon(ImageIO.read(new File("icons/ExportToDocument.png")));
-			CLEAR_ICON = new ImageIcon(ImageIO.read(new File("icons/MinusRedButton.png")));
-			RECORD_ICON = new ImageIcon(ImageIO.read(new File("icons/RecordButton.png")));
-			RECORD_ICON_SMALL = new ImageIcon(ImageIO.read(new File("icons/RecordButtonSmall.png")));
-			OPEN_ICON = new ImageIcon(ImageIO.read(new File("icons/WriteDocumentSmall.png")));
-			REMOVE_ICON = new ImageIcon(ImageIO.read(new File("icons/Remove.png")));
-			ADD_ICON = new ImageIcon(ImageIO.read(new File("icons/Add.png")));
+						
+			START_ICON = new ImageIcon(ImageIO.read(R.class.getResource("/Play.png")));
+			START_ICON_SMALL = new ImageIcon(ImageIO.read(R.class.getResource("/PlaySmall.png")));
+			STOP_ICON = new ImageIcon(ImageIO.read(R.class.getResource("/Stop.png")));
+			EXPORT_ICON = new ImageIcon(ImageIO.read(R.class.getResource("/ExportToDocument.png")));
+			CLEAR_ICON = new ImageIcon(ImageIO.read(R.class.getResource("/MinusRedButton.png")));
+			RECORD_ICON = new ImageIcon(ImageIO.read(R.class.getResource("/RecordButton.png")));
+			RECORD_ICON_SMALL = new ImageIcon(ImageIO.read(R.class.getResource("/RecordButtonSmall.png")));
+			OPEN_ICON = new ImageIcon(ImageIO.read(R.class.getResource("/WriteDocumentSmall.png")));
+			REMOVE_ICON = new ImageIcon(ImageIO.read(R.class.getResource("/Remove.png")));
+			ADD_ICON = new ImageIcon(ImageIO.read(R.class.getResource("/Add.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 	}
 
+	private R(){}
+	
 }

@@ -55,7 +55,7 @@ public class HelpPanel extends JPanel {
 		this.append("This application tries to solve simple generalized assignment problem (GAP) instances using:",null);
 		this.append("- a genetic algorithm GA",null);
 		this.append("- a bionomic algorithm BA (GA variant)",null);
-		this.append("- an ACO-based algorithm ANTS.",null);
+		this.append("- an ACO-based algorithm ANTS",null);
 		
 		this.append("GA, BA and ANTS algorithm parameters are configurable up to a certain level.", null);
 
